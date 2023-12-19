@@ -14,5 +14,10 @@ export class Circle {
     draw(p: p5): void {
         p.ellipse(this.x, this.y, this.radius * 2);
     }
+
+    move(dx: number, dy: number): void {
+        this.x += dx;
+        this.y += dy;
+      }
 }
 
