@@ -1,0 +1,20 @@
+{
+  "name": "mm_clone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx tsc && node ./dist/index.js"  
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/p5": "^1.7.6",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "p5": "^1.9.0"
+  }
+}
