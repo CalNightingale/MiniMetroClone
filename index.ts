@@ -1,5 +1,8 @@
 //import p5 from "p5";
-import { Circle } from "./Circle.js";
+import { Station } from "./assets/objects/Station.js";
+import { StationType } from "./assets/objects/StationType.js";
+import { Constants } from "./assets/constants.js";
+
 
 declare global {
     interface Window {
@@ -10,33 +13,37 @@ declare global {
   declare var p5: any;
   
   let mySketch = (p: typeof p5) => {
-    let myCircle: Circle;
+    let stations: Station[] = [];
   
     p.setup = () => {
-        p.createCanvas(400, 400);
-        myCircle = new Circle(200, 200, 50);
+        p.createCanvas(Constants.CANVAS_WIDTH, Constants.CANVAS_HEIGHT);
+        stations.push(new Station(200, 200, StationType.Circle));
+        stations.push(new Station(400, 200, StationType.Square));
+        stations.push(new Station(600, 200, StationType.Triangle));
     };
   
     p.draw = () => {
-        p.background(220);
-        myCircle.draw(p);
+        p.background('#fafafa');
+        stations.forEach( (station) => {station.draw(p)})
     };
 
     p.keyPressed = () => {
-        switch (p.keyCode) {
-          case p.LEFT_ARROW:
-            myCircle.move(-5, 0);
-            break;
-          case p.RIGHT_ARROW:
-            myCircle.move(5, 0);
-            break;
-          case p.UP_ARROW:
-            myCircle.move(0, -5);
-            break;
-          case p.DOWN_ARROW:
-            myCircle.move(0, 5);
-            break;
-        }
+        stations.forEach( (station) => {
+            switch (p.keyCode) {
+                case p.LEFT_ARROW:
+                  station.move(-5, 0);
+                  break;
+                case p.RIGHT_ARROW:
+                  station.move(5, 0);
+                  break;
+                case p.UP_ARROW:
+                  station.move(0, -5);
+                  break;
+                case p.DOWN_ARROW:
+                  station.move(0, 5);
+                  break;
+              }
+        })
     }
   };
   
