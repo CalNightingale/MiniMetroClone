@@ -37,6 +37,11 @@ export class StationGraph {
             p.stroke('white');
             p.line(edge.from.x, edge.from.y, edge.to.x, edge.to.y);
         });
+
+        if (this.isDragging && this.dragStartStation && this.dragEndPoint) {
+            p.stroke('red');
+            p.line(this.dragStartStation.x, this.dragStartStation.y, this.dragEndPoint.x, this.dragEndPoint.y);
+        }
     }
 
     keyPressed(p: p5): void {
@@ -58,5 +63,40 @@ export class StationGraph {
         })
     }
 
+    // Add these properties to the StationGraph class
+    public isDragging: boolean = false;
+    private dragStartStation: Station | null = null;
+    private dragEndPoint: { x: number, y: number } | null = null;
+
+    // Call this method when a drag starts
+    startDrag(station: Station): void {
+        this.isDragging = true;
+        this.dragStartStation = station;
+    }
+
+    // Call this method when the drag ends
+    endDrag(): void {
+        this.isDragging = false;
+        this.dragStartStation = null;
+        this.dragEndPoint = null;
+    }
+
+    // Call this method during a drag to update the end point
+    updateDragPoint(x: number, y: number): void {
+        if (this.isDragging) {
+            this.dragEndPoint = { x, y };
+        }
+    }
+
     // Additional methods like removing stations, finding paths, etc. can be added here.
+    // Add this method to the StationGraph class
+    getStationAtMouse(p: p5): Station | undefined {
+        for (let [id, station] of this.stations) {
+            if (station.isMouseOver(p)) {
+                return station;
+            }
+        }
+        return undefined; // No station is under the mouse
+    }
+
 }

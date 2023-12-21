@@ -40,4 +40,8 @@ export class Station {
         this.y += dy;
         this.visual.move(dx, dy)
     }
+
+    isMouseOver(p: p5): boolean {
+        return this.visual.isMouseOver(p);
+    }
 }

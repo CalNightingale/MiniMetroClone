@@ -25,6 +25,23 @@ import { StationGraph } from "./assets/StationGraph.js";
     p.keyPressed = () => {
       graph.keyPressed(p);
     }
+
+    p.mousePressed = () => {
+      let clickedStation = graph.getStationAtMouse(p);
+      if (clickedStation) {
+          graph.startDrag(clickedStation);
+      }
+    };
+
+    p.mouseReleased = () => {
+      graph.endDrag();
+    };
+
+    p.mouseDragged = () => {
+      if (graph.isDragging) {
+          graph.updateDragPoint(p.mouseX, p.mouseY);
+      }
+    };
   };
   
   new p5(mySketch);
