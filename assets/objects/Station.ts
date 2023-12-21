@@ -13,20 +13,20 @@ export class Station {
     visual: Shape;
     stationType: StationType;
 
-    constructor(x: number, y: number, stationType: StationType) {
+    constructor(x: number, y: number, stationType: StationType, p: p5) {
         this.x = x;
         this.y = y;
         this.size = Constants.STATION_SIZE;
         this.stationType = stationType;
         switch (this.stationType) {
             case StationType.Circle:
-                this.visual = new Circle(x, y, this.size/2);
+                this.visual = new Circle(x, y, this.size/2, p.color('white'));
                 break;
             case StationType.Square:
-                this.visual = new Square(x, y, this.size);
+                this.visual = new Square(x, y, this.size, p.color('white'));
                 break;
             case StationType.Triangle:
-                this.visual = new Triangle(x, y, this.size);
+                this.visual = new Triangle(x, y, this.size, p.color('white'));
                 break;
         }
     }

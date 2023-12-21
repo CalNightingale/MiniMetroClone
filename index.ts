@@ -1,25 +1,17 @@
-//import p5 from "p5";
+import p5 from "p5";
 import { Station } from "./assets/objects/Station.js";
 import { StationType } from "./assets/objects/StationType.js";
 import { Constants } from "./assets/constants.js";
 
-
-declare global {
-    interface Window {
-      p5: typeof p5;
-    }
-  }
-
-  declare var p5: any;
   
-  let mySketch = (p: typeof p5) => {
+  let mySketch = (p: p5) => {
     let stations: Station[] = [];
   
     p.setup = () => {
         p.createCanvas(Constants.CANVAS_WIDTH, Constants.CANVAS_HEIGHT);
-        stations.push(new Station(200, 200, StationType.Circle));
-        stations.push(new Station(400, 200, StationType.Square));
-        stations.push(new Station(600, 200, StationType.Triangle));
+        stations.push(new Station(200, 200, StationType.Circle, p));
+        stations.push(new Station(400, 200, StationType.Square, p));
+        stations.push(new Station(600, 200, StationType.Triangle, p));
     };
   
     p.draw = () => {
@@ -47,4 +39,4 @@ declare global {
     }
   };
   
-  new window.p5(mySketch);
+  new p5(mySketch);

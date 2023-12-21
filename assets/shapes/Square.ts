@@ -2,18 +2,13 @@ import p5 from "p5";
 import { Shape } from "./Shape.js";
 import { Constants } from "../constants.js";
 
-export class Square implements Shape{
-    x: number;
-    y: number;
-    size: number;
-
-    constructor(x: number, y: number, size: number) {
-        this.x = x;
-        this.y = y;
-        this.size = size;
+export class Square extends Shape{
+    constructor(x: number, y: number, size: number, color: p5.Color) {
+        super(x, y, size, color);
     }
 
     draw(p: p5): void {
+        super.draw(p);
         p.strokeWeight(Constants.STATION_OUTLINE);
         p.square(this.x, this.y, this.size);
     }
