@@ -3,4 +3,8 @@ export const Constants = {
     CANVAS_HEIGHT: 600,
     STATION_SIZE: 40,
     STATION_OUTLINE: 10,
+    // PEOPLE
+    PERSON_SIZE: 12.5,
+    PERSON_XOFFSET: 10,
+    PERSON_YOFFSET: 10,
 };

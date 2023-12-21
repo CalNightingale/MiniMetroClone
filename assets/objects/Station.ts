@@ -5,16 +5,19 @@ import { Shape } from '../shapes/Shape';
 import { Circle } from '../shapes/Circle';
 import { Triangle } from '../shapes/Triangle';
 import { Square } from '../shapes/Square';
+import { Person } from './Person';
 
 export class Station {
+    static lastID = 0;
+
     x: number;
     y: number;
     id: number;
     size: number;
     visual: Shape;
+    people: Person[];
     stationType: StationType;
     outlineColor: string;
-    static lastID = 0;
 
     constructor(x: number, y: number, stationType: StationType, p: p5) {
         this.x = x;
@@ -22,6 +25,7 @@ export class Station {
         this.size = Constants.STATION_SIZE;
         this.stationType = stationType;
         this.outlineColor = 'black';
+        this.people = [];
         this.id = Station.lastID++; // Assign a unique ID to the station.
         switch (this.stationType) {
             case StationType.Circle:
@@ -42,7 +46,22 @@ export class Station {
 
     draw(p: p5): void {
         p.stroke(this.outlineColor);
+        // first draw visual
         this.visual.draw(p);
+        // now draw people
+        this.drawPeople(p);
+    }
+
+    drawPeople(p: p5): void {
+        p.strokeWeight(0);
+        p.fill('black');
+        for (let i = 0; i < this.people.length; i++) {
+            let personToDraw = this.people[i];
+            let personX = this.x + this.size + Constants.PERSON_XOFFSET * (i+1) 
+                                + Constants.PERSON_SIZE * i;
+            let personY = this.y - Constants.PERSON_SIZE; // TODO MULTIROW???
+            personToDraw.draw(p, personX, personY);
+        }
     }
 
     getCenterX(): number {
@@ -61,6 +80,15 @@ export class Station {
 
     isMouseOver(x: number, y: number): boolean {
         return this.visual.isMouseOver(x, y);
+    }
+
+    addPerson(person: Person): void {
+        console.log(`Adding person ${person.toString()} to station ${this.toString()}`)
+        this.people.push(person);
+    }
+
+    removePerson(): Person | undefined {
+        return this.people.pop();
     }
 
     toString(): string {
