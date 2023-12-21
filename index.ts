@@ -11,10 +11,9 @@ import { StationGraph } from "./assets/StationGraph.js";
     p.setup = () => {
         p.createCanvas(Constants.CANVAS_WIDTH, Constants.CANVAS_HEIGHT);
         graph = new StationGraph;
-        graph.addStation('1', new Station(200, 200, StationType.Circle, p));
-        graph.addStation('2', new Station(400, 200, StationType.Square, p));
-        graph.addStation('3', new Station(600, 200, StationType.Triangle, p));
-
+        graph.addStation(new Station(200, 200, StationType.Circle, p));
+        graph.addStation(new Station(400, 200, StationType.Square, p));
+        graph.addStation(new Station(600, 200, StationType.Triangle, p));
     };
   
     p.draw = () => {

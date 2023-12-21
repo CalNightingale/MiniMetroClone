@@ -4,23 +4,23 @@ import { Station } from './objects/Station';
 type Edge = { from: Station, to: Station, line: string };
 
 export class StationGraph {
-    private stations: Map<string, Station>;
+    private stations: Station[];
     private edges: Edge[];
     private lines: string[];
     private activeLine: number;
 
     constructor() {
-        this.stations = new Map<string, Station>();
+        this.stations = [];
         this.edges = [];
         this.lines = ['red', 'green', 'blue'];
         this.activeLine = 0;
     }
 
-    addStation(id: string, station: Station): void {
-        if (this.stations.has(id)) {
-            throw new Error(`Station with id ${id} already exists.`);
+    addStation(station: Station): void {
+        if (this.stations.indexOf(station) > -1) {
+            throw new Error(`Station with id ${station.id} already exists.`);
         }
-        this.stations.set(id, station);
+        this.stations.push(station);
     }
 
     addEdge(fromStation: Station, toStation: Station, line: string): void {
@@ -143,7 +143,7 @@ export class StationGraph {
         if (!x || !y) {
             return undefined;
         }
-        for (let [id, station] of this.stations) {
+        for (let station of this.stations) {
             if (station.isMouseOver(x, y)) {
                 return station;
             }
