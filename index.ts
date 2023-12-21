@@ -1,8 +1,8 @@
 import p5 from "p5";
-import { Station } from "./assets/objects/Station.js";
-import { StationType } from "./assets/objects/StationType.js";
-import { Constants } from "./assets/constants.js";
-import { StationGraph } from "./assets/StationGraph.js";
+import { Station } from "./assets/objects/Station";
+import { StationType } from "./assets/objects/StationType";
+import { Constants } from "./assets/constants";
+import { StationGraph } from "./assets/StationGraph";
 
   
   let mySketch = (p: p5) => {

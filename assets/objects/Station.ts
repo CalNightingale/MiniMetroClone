@@ -1,10 +1,10 @@
 import p5 from 'p5';
-import { StationType } from './StationType.js';
-import { Constants } from '../constants.js';
-import { Shape } from '../shapes/Shape.js';
-import { Circle } from '../shapes/Circle.js';
-import { Triangle } from '../shapes/Triangle.js';
-import { Square } from '../shapes/Square.js';
+import { StationType } from './StationType';
+import { Constants } from '../constants';
+import { Shape } from '../shapes/Shape';
+import { Circle } from '../shapes/Circle';
+import { Triangle } from '../shapes/Triangle';
+import { Square } from '../shapes/Square';
 
 export class Station {
     x: number;

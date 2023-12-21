@@ -1,6 +1,6 @@
 import p5 from "p5";
-import { Shape } from "./Shape.js";
-import { Constants } from "../constants.js";
+import { Shape } from "./Shape";
+import { Constants } from "../constants";
 
 export class Triangle extends Shape{
     constructor(x: number, y: number, size: number, color: p5.Color) {
