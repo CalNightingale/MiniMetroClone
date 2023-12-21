@@ -3,6 +3,7 @@ import { Station } from "./assets/objects/Station";
 import { StationType } from "./assets/objects/StationType";
 import { Constants } from "./assets/constants";
 import { StationGraph } from "./assets/StationGraph";
+import { Person } from "./assets/objects/Person";
 
   
   let mySketch = (p: p5) => {
@@ -11,7 +12,9 @@ import { StationGraph } from "./assets/StationGraph";
     p.setup = () => {
         p.createCanvas(Constants.CANVAS_WIDTH, Constants.CANVAS_HEIGHT);
         graph = new StationGraph;
-        graph.addStation(new Station(200, 200, StationType.Circle, p));
+        let stationA = new Station(200, 200, StationType.Circle, p);
+        stationA.addPerson(new Person(StationType.Triangle));
+        graph.addStation(stationA);
         graph.addStation(new Station(400, 400, StationType.Square, p));
         graph.addStation(new Station(600, 200, StationType.Triangle, p));
     };
