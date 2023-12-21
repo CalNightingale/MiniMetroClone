@@ -59,8 +59,8 @@ export class Station {
         this.visual.move(dx, dy)
     }
 
-    isMouseOver(p: p5): boolean {
-        return this.visual.isMouseOver(p);
+    isMouseOver(x: number, y: number): boolean {
+        return this.visual.isMouseOver(x, y);
     }
 
     toString(): string {

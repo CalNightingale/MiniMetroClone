@@ -24,8 +24,8 @@ export abstract class Shape {
         this.y += dy;
     }
 
-    isMouseOver(p: p5): boolean {
-        return p.mouseX > this.x && p.mouseX < this.x + this.size
-        && p.mouseY > this.y && p.mouseY < this.y + this.size;
+    isMouseOver(x: number, y: number): boolean {
+        return x > this.x && x < this.x + this.size
+        && y > this.y && y < this.y + this.size;
     }
 }

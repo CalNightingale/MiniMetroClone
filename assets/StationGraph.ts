@@ -30,6 +30,11 @@ export class StationGraph {
             (edge.from === toStation && edge.to === fromStation)
         );
 
+        if (fromStation == toStation) {
+            console.log(`Ignoring self-edge at station ${fromStation.toString()}`)
+            return;
+        }
+
         if (!edgeExists) {
             console.log(`Adding edge from ${fromStation.toString()} to ${toStation.toString()}`);
             this.edges.push({ from: fromStation, to: toStation, line });
@@ -41,7 +46,7 @@ export class StationGraph {
     draw(p: p5): void {
         // draw line if dragging
         if (this.isDragging && this.dragStartStation && this.dragEndPoint) {
-            p.stroke('red');
+            p.stroke(this.lines[this.activeLine]);
             p.line(this.dragStartStation.getCenterX(), this.dragStartStation.getCenterY(), 
                     this.dragEndPoint.x, this.dragEndPoint.y);
         }
@@ -113,15 +118,33 @@ export class StationGraph {
     // Call this method during a drag to update the end point
     updateDragPoint(x: number, y: number): void {
         if (this.isDragging) {
+            let hoveredStation = this.getStationAtMouse(x, y);
+            if (hoveredStation) {
+                hoveredStation.setOutlineColor(this.lines[this.activeLine]);
+            } else {
+                // either we've never hovered, or we used to be and no longer are
+                let oldHoveredStation = null;
+                if (this.dragEndPoint) {
+                    oldHoveredStation = this.getStationAtMouse(this.dragEndPoint.x, this.dragEndPoint.y);
+                    if (oldHoveredStation && oldHoveredStation != this.dragStartStation) {
+                        oldHoveredStation.setOutlineColor('black');
+                    }
+                }
+            }
+            // update drag end point
             this.dragEndPoint = { x, y };
         }
     }
 
     // Additional methods like removing stations, finding paths, etc. can be added here.
     // Add this method to the StationGraph class
-    getStationAtMouse(p: p5): Station | undefined {
+    getStationAtMouse(x: number | null, y: number | null): Station | undefined {
+        //console.log(`MOUSE CHECK: ${x}, ${y}`);
+        if (!x || !y) {
+            return undefined;
+        }
         for (let [id, station] of this.stations) {
-            if (station.isMouseOver(p)) {
+            if (station.isMouseOver(x, y)) {
                 return station;
             }
         }

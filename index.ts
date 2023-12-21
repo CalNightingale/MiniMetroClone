@@ -27,14 +27,14 @@ import { StationGraph } from "./assets/StationGraph.js";
     }
 
     p.mousePressed = () => {
-      let clickedStation = graph.getStationAtMouse(p);
+      let clickedStation = graph.getStationAtMouse(p.mouseX, p.mouseY);
       if (clickedStation) {
           graph.startDrag(clickedStation);
       }
     };
 
     p.mouseReleased = () => {
-      let endStation = graph.getStationAtMouse(p);
+      let endStation = graph.getStationAtMouse(p.mouseX, p.mouseY);
       graph.endDrag(endStation);
     };
 
