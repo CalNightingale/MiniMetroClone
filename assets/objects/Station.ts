@@ -9,10 +9,12 @@ import { Square } from '../shapes/Square.js';
 export class Station {
     x: number;
     y: number;
+    id: number;
     size: number;
     visual: Shape;
     stationType: StationType;
     outlineColor: string;
+    static lastID = 0;
 
     constructor(x: number, y: number, stationType: StationType, p: p5) {
         this.x = x;
@@ -20,6 +22,7 @@ export class Station {
         this.size = Constants.STATION_SIZE;
         this.stationType = stationType;
         this.outlineColor = 'black';
+        this.id = Station.lastID++; // Assign a unique ID to the station.
         switch (this.stationType) {
             case StationType.Circle:
                 this.visual = new Circle(x, y, this.size/2, p.color('white'));
@@ -58,5 +61,10 @@ export class Station {
 
     isMouseOver(p: p5): boolean {
         return this.visual.isMouseOver(p);
+    }
+
+    toString(): string {
+        // Assuming the station has an 'id' property that is unique
+        return `Station(${this.id}) at coordinates (${this.x}, ${this.y})`;
     }
 }

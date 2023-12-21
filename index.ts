@@ -34,7 +34,8 @@ import { StationGraph } from "./assets/StationGraph.js";
     };
 
     p.mouseReleased = () => {
-      graph.endDrag();
+      let endStation = graph.getStationAtMouse(p);
+      graph.endDrag(endStation);
     };
 
     p.mouseDragged = () => {

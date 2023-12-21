@@ -1,7 +1,7 @@
 import p5 from 'p5';
 import { Station } from './objects/Station';
 
-type Edge = { from: Station, to: Station, weight: number };
+type Edge = { from: Station, to: Station, line: string };
 
 export class StationGraph {
     private stations: Map<string, Station>;
@@ -23,15 +23,19 @@ export class StationGraph {
         this.stations.set(id, station);
     }
 
-    addEdge(fromId: string, toId: string, weight: number = 1): void {
-        const fromStation = this.stations.get(fromId);
-        const toStation = this.stations.get(toId);
+    addEdge(fromStation: Station, toStation: Station, line: string): void {
+        // Check if the edge already exists in either direction
+        const edgeExists = this.edges.some(edge =>
+            (edge.from === fromStation && edge.to === toStation) ||
+            (edge.from === toStation && edge.to === fromStation)
+        );
 
-        if (!fromStation || !toStation) {
-            throw new Error('Station(s) not found');
+        if (!edgeExists) {
+            console.log(`Adding edge from ${fromStation.toString()} to ${toStation.toString()}`);
+            this.edges.push({ from: fromStation, to: toStation, line });
+        } else {
+            console.log(`Edge from ${fromStation.toString()} to ${toStation.toString()} already exists.`);
         }
-
-        this.edges.push({ from: fromStation, to: toStation, weight });
     }
 
     draw(p: p5): void {
@@ -42,14 +46,17 @@ export class StationGraph {
                     this.dragEndPoint.x, this.dragEndPoint.y);
         }
 
+        // then draw edges
+        this.edges.forEach(edge => {
+            p.stroke(edge.line);
+            p.line(edge.from.getCenterX(), edge.from.getCenterY(), 
+                    edge.to.getCenterX(), edge.to.getCenterY());
+        });
+
         // then draw stations
         this.stations.forEach(station => station.draw(p));
 
-        // then draw edges
-        this.edges.forEach(edge => {
-            p.stroke('white');
-            p.line(edge.from.x, edge.from.y, edge.to.x, edge.to.y);
-        });
+        
     }
 
     keyPressed(p: p5): void {
@@ -85,10 +92,19 @@ export class StationGraph {
     }
 
     // Call this method when the drag ends
-    endDrag(): void {
+    endDrag(endStation: Station | undefined): void {
         this.isDragging = false;
         if (this.dragStartStation) {
             this.dragStartStation.setOutlineColor('black');
+        }
+        if (endStation) {
+            // reset end station color
+            endStation.setOutlineColor('black');
+        }
+        if (this.dragStartStation && endStation) {
+            // add edge to graph
+            let activeLineColorName = this.lines[this.activeLine];
+            this.addEdge(this.dragStartStation, endStation, activeLineColorName)
         }
         this.dragStartStation = null;
         this.dragEndPoint = null;
