@@ -31,17 +31,21 @@ export class StationGraph {
     }
 
     draw(p: p5): void {
+        // draw line if dragging
+        if (this.isDragging && this.dragStartStation && this.dragEndPoint) {
+            p.stroke('red');
+            p.line(this.dragStartStation.getCenterX(), this.dragStartStation.getCenterY(), 
+                    this.dragEndPoint.x, this.dragEndPoint.y);
+        }
+
+        // then draw stations
         this.stations.forEach(station => station.draw(p));
 
+        // then draw edges
         this.edges.forEach(edge => {
             p.stroke('white');
             p.line(edge.from.x, edge.from.y, edge.to.x, edge.to.y);
         });
-
-        if (this.isDragging && this.dragStartStation && this.dragEndPoint) {
-            p.stroke('red');
-            p.line(this.dragStartStation.x, this.dragStartStation.y, this.dragEndPoint.x, this.dragEndPoint.y);
-        }
     }
 
     keyPressed(p: p5): void {

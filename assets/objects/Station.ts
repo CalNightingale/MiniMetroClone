@@ -35,6 +35,14 @@ export class Station {
         this.visual.draw(p);
     }
 
+    getCenterX(): number {
+        return this.x + this.size/2;
+    }
+
+    getCenterY(): number {
+        return this.y + this.size/2;
+    }
+
     move(dx: number, dy: number): void {
         this.x += dx;
         this.y += dy;
