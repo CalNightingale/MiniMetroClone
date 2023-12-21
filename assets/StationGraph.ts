@@ -6,10 +6,14 @@ type Edge = { from: Station, to: Station, weight: number };
 export class StationGraph {
     private stations: Map<string, Station>;
     private edges: Edge[];
+    private lines: string[];
+    private activeLine: number;
 
     constructor() {
         this.stations = new Map<string, Station>();
         this.edges = [];
+        this.lines = ['red', 'green', 'blue'];
+        this.activeLine = 0;
     }
 
     addStation(id: string, station: Station): void {
@@ -76,11 +80,16 @@ export class StationGraph {
     startDrag(station: Station): void {
         this.isDragging = true;
         this.dragStartStation = station;
+        let activeLineColorName = this.lines[this.activeLine];
+        this.dragStartStation.setOutlineColor(activeLineColorName);
     }
 
     // Call this method when the drag ends
     endDrag(): void {
         this.isDragging = false;
+        if (this.dragStartStation) {
+            this.dragStartStation.setOutlineColor('black');
+        }
         this.dragStartStation = null;
         this.dragEndPoint = null;
     }

@@ -12,12 +12,14 @@ export class Station {
     size: number;
     visual: Shape;
     stationType: StationType;
+    outlineColor: string;
 
     constructor(x: number, y: number, stationType: StationType, p: p5) {
         this.x = x;
         this.y = y;
         this.size = Constants.STATION_SIZE;
         this.stationType = stationType;
+        this.outlineColor = 'black';
         switch (this.stationType) {
             case StationType.Circle:
                 this.visual = new Circle(x, y, this.size/2, p.color('white'));
@@ -31,7 +33,12 @@ export class Station {
         }
     }
 
+    setOutlineColor(newColor: string): void {
+        this.outlineColor = newColor;
+    }
+
     draw(p: p5): void {
+        p.stroke(this.outlineColor);
         this.visual.draw(p);
     }
 
