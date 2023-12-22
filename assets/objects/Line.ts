@@ -28,7 +28,7 @@ export class Line {
         edge.to.addLineToPort(this, edge.toPort);
         // If this is the first edge on this line (line was just created), add a train!
         if (this.edges.length == 1) {
-            let newTrain = new Train(edge.from);
+            let newTrain = new Train(edge.from, edge.fromPort);
             this.trains.push(newTrain);
         }
     }

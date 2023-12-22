@@ -14,4 +14,5 @@ export const Constants = {
     TRAIN_ASPECT: 0.6,
     PASSENGER_SIZE_MULTIPLIER: 0.7,
     PASSENGER_LIGHTNESS_FACTOR: 0.7,
+    TRAIN_SPEED:1, // units: pixels per frame
 };

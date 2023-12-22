@@ -5,16 +5,20 @@ import { Person } from "./Person";
 import { Constants } from "../constants";
 import { Station } from "./Station";
 import { Line } from "./Line";
+import { StationPort } from "./StationPort";
+import { Edge } from "./Edge";
 
 export class Train {
     visual: TrainShape;
     passengers: Person[];
+    moveDirection: {x: number, y: number};
 
-    constructor(spawnStation: Station) {
+    constructor(spawnStation: Station, fromPort: StationPort) {
         let x = spawnStation.getCenterX();
         let y = spawnStation.getCenterY();
         this.visual = new TrainShape(x, y);
         this.passengers = [];
+        this.moveDirection = Edge.getDirectionVector(fromPort);
     }
 
     draw(p: p5, trainColor: string) {

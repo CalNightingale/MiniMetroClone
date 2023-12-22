@@ -19,17 +19,17 @@ export class Edge {
     }
 
     // return dx, dy for vector
-    static getDirectionVector(port: StationPort): [number, number]{
+    static getDirectionVector(port: StationPort): {x: number, y: number}{
         switch (port) {
-            case StationPort.N:  return [0,1];
-            case StationPort.NE: return [1,1];
-            case StationPort.E:  return [1,0];
-            case StationPort.SE: return [1,-1];
-            case StationPort.S:  return [0,-1];
-            case StationPort.SW: return [-1,-1];
-            case StationPort.W:  return [-1,0];
-            case StationPort.NW: return [-1,1];
-            default:             return [0,0];
+            case StationPort.N:  return {x: 0, y: 1};
+            case StationPort.NE: return {x: 1, y: 1};
+            case StationPort.E:  return {x: 1, y: 0};
+            case StationPort.SE: return {x: 1, y: -1};
+            case StationPort.S:  return {x: 0, y: -1};
+            case StationPort.SW: return {x: -1, y: -1};
+            case StationPort.W:  return {x: -1, y: 0};
+            case StationPort.NW: return {x: -1, y: 1};
+            default:             return {x: 0, y: 0};
         }
     }
 
