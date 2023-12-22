@@ -6,6 +6,7 @@ import { Circle } from '../shapes/Circle';
 import { Triangle } from '../shapes/Triangle';
 import { Square } from '../shapes/Square';
 import { Person } from './Person';
+import { StationPort } from './StationPort';
 
 export class Station {
     static lastID = 0;
@@ -14,10 +15,11 @@ export class Station {
     y: number;
     id: number;
     size: number;
-    visual: Shape;
-    people: Person[];
+    private visual: Shape;
+    private people: Person[];
     stationType: StationType;
     outlineColor: string;
+    private ports: Map<StationPort, string | null>;
 
     constructor(x: number, y: number, stationType: StationType, p: p5) {
         this.x = x;
@@ -26,6 +28,10 @@ export class Station {
         this.stationType = stationType;
         this.outlineColor = 'black';
         this.people = [];
+        // populate ports
+        this.ports = new Map<StationPort, string | null>;
+        Object.keys(StationPort).forEach((key, index) => {this.ports.set(index, null)});
+
         this.id = Station.lastID++; // Assign a unique ID to the station.
         switch (this.stationType) {
             case StationType.Circle:
@@ -38,6 +44,10 @@ export class Station {
                 this.visual = new Triangle(x, y, this.size, p.color('white'));
                 break;
         }
+    }
+
+    addLineToPort(line: string, port: StationPort) {
+        this.ports.set(port, line);
     }
 
     setOutlineColor(newColor: string): void {

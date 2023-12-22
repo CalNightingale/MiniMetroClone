@@ -16,7 +16,7 @@ import { Person } from "./assets/objects/Person";
         stationA.addPerson(new Person(StationType.Triangle));
         graph.addStation(stationA);
         graph.addStation(new Station(400, 400, StationType.Square, p));
-        graph.addStation(new Station(600, 200, StationType.Triangle, p));
+        graph.addStation(new Station(600, 400, StationType.Triangle, p));
     };
   
     p.draw = () => {

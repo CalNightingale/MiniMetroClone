@@ -1,8 +1,7 @@
 import p5 from 'p5';
 import { Station } from './objects/Station';
 import { Constants } from './constants';
-
-type Edge = { from: Station, to: Station, line: string };
+import { Edge } from './objects/Edge';
 
 export class StationGraph {
     private stations: Station[];
@@ -38,7 +37,11 @@ export class StationGraph {
 
         if (!edgeExists) {
             console.log(`Adding edge from ${fromStation.toString()} to ${toStation.toString()}`);
-            this.edges.push({ from: fromStation, to: toStation, line });
+            // update station ports
+            let newEdge = new Edge(fromStation, toStation, line);
+            
+            // add to logical edge list
+            this.edges.push(newEdge);
         } else {
             console.log(`Edge from ${fromStation.toString()} to ${toStation.toString()} already exists.`);
         }
@@ -54,16 +57,10 @@ export class StationGraph {
         }
 
         // then draw edges
-        this.edges.forEach(edge => {
-            p.stroke(edge.line);
-            p.line(edge.from.getCenterX(), edge.from.getCenterY(), 
-                    edge.to.getCenterX(), edge.to.getCenterY());
-        });
+        this.edges.forEach(edge => edge.draw(p));
 
         // then draw stations
         this.stations.forEach(station => station.draw(p));
-
-        
     }
 
     keyPressed(p: p5): void {
@@ -110,8 +107,8 @@ export class StationGraph {
         }
         if (this.dragStartStation && endStation) {
             // add edge to graph
-            let activeLineColorName = this.lines[this.activeLine];
-            this.addEdge(this.dragStartStation, endStation, activeLineColorName)
+            let activeLineName = this.lines[this.activeLine];
+            this.addEdge(this.dragStartStation, endStation, activeLineName)
         }
         this.dragStartStation = null;
         this.dragEndPoint = null;
