@@ -50,14 +50,15 @@ export class Train {
         let startY = trainUpperLeftY + (trainHeight - gridHeight) / 2;
 
         // Draw the squares in a 2x3 grid
+        let passengerIndex = 0;
         for (let row = 0; row < 2; row++) {
             for (let col = 0; col < 3; col++) {
-                let passengerIndex = col + row;
                 if (passengerIndex >= this.passengers.length) break;
                 let x = startX + col * (passengerSize + Constants.PERSON_OFFSET);
                 let y = startY + row * (passengerSize + Constants.PERSON_OFFSET);
                 let person = this.passengers[passengerIndex];
                 person.drawPassenger(p, x, y, this.line);
+                passengerIndex++;
             }
         }
     }
