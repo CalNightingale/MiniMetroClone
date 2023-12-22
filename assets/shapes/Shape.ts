@@ -5,9 +5,9 @@ export abstract class Shape {
     x: number;
     y: number;
     size: number;
-    color: p5.Color;
+    color: string;
 
-    constructor(x: number, y: number, size: number, color: p5.Color) {
+    constructor(x: number, y: number, size: number, color: string) {
         this.x = x;
         this.y = y;
         this.size = size;

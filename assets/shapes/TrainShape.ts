@@ -7,7 +7,7 @@ export class TrainShape extends Shape {
     angle: number;
 
     // train shape defined by its center
-    constructor(x: number, y: number, color: p5.Color) {
+    constructor(x: number, y: number, color: string) {
         super(x, y, Constants.TRAIN_LENGTH, color);
         this.angle = 0;
     }

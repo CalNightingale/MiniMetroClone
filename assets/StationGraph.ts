@@ -59,7 +59,7 @@ export class StationGraph {
 
     draw(p: p5): void {
         // draw line if dragging
-        p.strokeWeight(Constants.STATION_OUTLINE)
+        p.strokeWeight(Constants.EDGE_WIDTH);
         if (this.isDragging && this.dragStartStation && this.dragEndPoint) {
             p.stroke(this.lines[this.activeLine]);
             p.line(this.dragStartStation.getCenterX(), this.dragStartStation.getCenterY(), 

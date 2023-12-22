@@ -35,13 +35,13 @@ export class Station {
         this.id = Station.lastID++; // Assign a unique ID to the station.
         switch (this.stationType) {
             case StationType.Circle:
-                this.visual = new Circle(x, y, this.size/2, p.color('white'));
+                this.visual = new Circle(x, y, this.size/2, 'white');
                 break;
             case StationType.Square:
-                this.visual = new Square(x, y, this.size, p.color('white'));
+                this.visual = new Square(x, y, this.size, 'white');
                 break;
             case StationType.Triangle:
-                this.visual = new Triangle(x, y, this.size, p.color('white'));
+                this.visual = new Triangle(x, y, this.size, 'white');
                 break;
         }
     }
@@ -56,6 +56,7 @@ export class Station {
 
     draw(p: p5): void {
         p.stroke(this.outlineColor);
+        p.strokeWeight(Constants.STATION_OUTLINE);
         // first draw visual
         this.visual.draw(p);
         // now draw people

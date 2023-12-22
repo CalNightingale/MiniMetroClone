@@ -8,7 +8,7 @@ export const Constants = {
     PERSON_SIZE: 12.5,
     PERSON_XOFFSET: 10,
     PERSON_YOFFSET: 10,
-    PERSON_OFFSET: 10, // TODO REMOVE X and Y OFFSET, just use this
+    PERSON_OFFSET: 5, // TODO REMOVE X and Y OFFSET, just use this
     // TRAINS
     TRAIN_LENGTH: 50,
     TRAIN_ASPECT: 0.6,
