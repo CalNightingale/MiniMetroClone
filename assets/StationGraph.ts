@@ -20,18 +20,16 @@ export class StationGraph {
         this.activeLine = 0;
     }
 
+    getActiveLine(): Line | null {
+        if (this.lines.length == 0) return null;
+        return this.lines[this.activeLine];
+    }
+
     addStation(station: Station): void {
         if (this.stations.indexOf(station) > -1) {
             throw new Error(`Station with id ${station.id} already exists.`);
         }
         this.stations.push(station);
-    }
-
-    addTrain(train: Train): void {
-        if (this.trains.indexOf(train) > -1) {
-            throw new Error(`Train already exists`);
-        }
-        this.trains.push(train);
     }
 
     addEdge(fromStation: Station, toStation: Station, line: Line): void {
@@ -67,10 +65,8 @@ export class StationGraph {
                     this.dragEndPoint.x, this.dragEndPoint.y);
         }
 
-        // then draw lines
+        // then draw lines (lines handle trains)
         this.lines.forEach(line => line.draw(p));
-        // then trains
-        this.trains.forEach(train => train.draw(p));
 
         // then draw stations
         this.stations.forEach(station => station.draw(p));

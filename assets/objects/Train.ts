@@ -3,30 +3,32 @@ import { Shape } from "../shapes/Shape";
 import { TrainShape } from "../shapes/TrainShape";
 import { Person } from "./Person";
 import { Constants } from "../constants";
+import { Station } from "./Station";
+import { Line } from "./Line";
 
 export class Train {
     visual: TrainShape;
     passengers: Person[];
-    line: string;
 
-    constructor(x: number, y: number, line: string) {
-        this.visual = new TrainShape(x, y, line);
-        this.line = line;
+    constructor(spawnStation: Station) {
+        let x = spawnStation.getCenterX();
+        let y = spawnStation.getCenterY();
+        this.visual = new TrainShape(x, y);
         this.passengers = [];
     }
 
-    draw(p: p5) {
+    draw(p: p5, trainColor: string) {
         // draw the train itself
         this.visual.draw(p);
         // draw the passengers
-        this.drawPassengers(p);
+        this.drawPassengers(p, trainColor);
     }
 
     addPassenger(passenger: Person) {
         this.passengers.push(passenger);
     }
 
-    drawPassengers(p: p5): void {
+    drawPassengers(p: p5, trainColor: string): void {
         p.strokeWeight(0);
 
         // Calculate the total grid size
@@ -57,7 +59,7 @@ export class Train {
                 let x = startX + col * (passengerSize + Constants.PERSON_OFFSET);
                 let y = startY + row * (passengerSize + Constants.PERSON_OFFSET);
                 let person = this.passengers[passengerIndex];
-                person.drawPassenger(p, x, y, this.line);
+                person.drawPassenger(p, x, y, trainColor);
                 passengerIndex++;
             }
         }

@@ -18,14 +18,6 @@ import { Train } from "./assets/objects/Train";
         graph.addStation(stationA);
         graph.addStation(new Station(400, 400, StationType.Square, p));
         graph.addStation(new Station(600, 400, StationType.Triangle, p));
-        let testTrain = new Train(400,200,'blue');
-        testTrain.addPassenger(new Person(StationType.Square));
-        testTrain.addPassenger(new Person(StationType.Circle));
-        testTrain.addPassenger(new Person(StationType.Triangle));
-        testTrain.addPassenger(new Person(StationType.Square));
-        testTrain.addPassenger(new Person(StationType.Square));
-        testTrain.addPassenger(new Person(StationType.Square));
-        graph.addTrain(testTrain);
     };
   
     p.draw = () => {
