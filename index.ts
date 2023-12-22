@@ -4,6 +4,7 @@ import { StationType } from "./assets/objects/StationType";
 import { Constants } from "./assets/constants";
 import { StationGraph } from "./assets/StationGraph";
 import { Person } from "./assets/objects/Person";
+import { Train } from "./assets/objects/Train";
 
   
   let mySketch = (p: p5) => {
@@ -17,6 +18,9 @@ import { Person } from "./assets/objects/Person";
         graph.addStation(stationA);
         graph.addStation(new Station(400, 400, StationType.Square, p));
         graph.addStation(new Station(600, 400, StationType.Triangle, p));
+        let testTrain = new Train(400,200,'blue',p.color('blue'));
+        testTrain.addPassenger(new Person(StationType.Square));
+        graph.addTrain(testTrain);
     };
   
     p.draw = () => {

@@ -2,16 +2,19 @@ import p5 from 'p5';
 import { Station } from './objects/Station';
 import { Constants } from './constants';
 import { Edge } from './objects/Edge';
+import { Train } from './objects/Train';
 
 export class StationGraph {
     private stations: Station[];
     private edges: Edge[];
     private lines: string[];
+    private trains: Train[];
     private activeLine: number;
 
     constructor() {
         this.stations = [];
         this.edges = [];
+        this.trains = [];
         this.lines = ['red', 'green', 'blue'];
         this.activeLine = 0;
     }
@@ -21,6 +24,13 @@ export class StationGraph {
             throw new Error(`Station with id ${station.id} already exists.`);
         }
         this.stations.push(station);
+    }
+
+    addTrain(train: Train): void {
+        if (this.trains.indexOf(train) > -1) {
+            throw new Error(`Train already exists`);
+        }
+        this.trains.push(train);
     }
 
     addEdge(fromStation: Station, toStation: Station, line: string): void {
@@ -39,7 +49,7 @@ export class StationGraph {
             console.log(`Adding edge from ${fromStation.toString()} to ${toStation.toString()}`);
             // update station ports
             let newEdge = new Edge(fromStation, toStation, line);
-            
+
             // add to logical edge list
             this.edges.push(newEdge);
         } else {
@@ -58,6 +68,8 @@ export class StationGraph {
 
         // then draw edges
         this.edges.forEach(edge => edge.draw(p));
+        // then trains
+        this.trains.forEach(train => train.draw(p));
 
         // then draw stations
         this.stations.forEach(station => station.draw(p));

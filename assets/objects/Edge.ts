@@ -1,6 +1,7 @@
 import p5 from "p5";
 import { Station } from "./Station"
 import { StationPort } from "./StationPort";
+import { Constants } from "../constants";
 
 export class Edge {
     from: Station; 
@@ -124,6 +125,8 @@ export class Edge {
     }
 
     draw(p: p5) {
+        p.push();
+        p.strokeWeight(Constants.EDGE_WIDTH)
         p.stroke(this.line); // this.line is a string representing the line color
 
         // Draw the first line to the joint
@@ -131,5 +134,6 @@ export class Edge {
 
         // Draw the second line from the joint to the destination
         p.line(this.jointX, this.jointY, this.to.getCenterX(), this.to.getCenterY());
+        p.pop();
     }
 }

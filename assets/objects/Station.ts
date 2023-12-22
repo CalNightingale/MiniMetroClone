@@ -70,7 +70,7 @@ export class Station {
             let personX = this.x + this.size + Constants.PERSON_XOFFSET * (i+1) 
                                 + Constants.PERSON_SIZE * i;
             let personY = this.y - Constants.PERSON_SIZE; // TODO MULTIROW???
-            personToDraw.draw(p, personX, personY);
+            personToDraw.drawWaiting(p, personX, personY);
         }
     }
 
