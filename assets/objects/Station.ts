@@ -7,6 +7,7 @@ import { Triangle } from '../shapes/Triangle';
 import { Square } from '../shapes/Square';
 import { Person } from './Person';
 import { StationPort } from './StationPort';
+import { Line } from './Line';
 
 export class Station {
     static lastID = 0;
@@ -19,7 +20,7 @@ export class Station {
     private people: Person[];
     stationType: StationType;
     outlineColor: string;
-    private ports: Map<StationPort, string | null>;
+    private ports: Map<StationPort, Line | null>;
 
     constructor(x: number, y: number, stationType: StationType, p: p5) {
         this.x = x;
@@ -29,7 +30,7 @@ export class Station {
         this.outlineColor = 'black';
         this.people = [];
         // populate ports
-        this.ports = new Map<StationPort, string | null>;
+        this.ports = new Map<StationPort, Line | null>;
         Object.keys(StationPort).forEach((key, index) => {this.ports.set(index, null)});
 
         this.id = Station.lastID++; // Assign a unique ID to the station.
@@ -46,7 +47,7 @@ export class Station {
         }
     }
 
-    addLineToPort(line: string, port: StationPort) {
+    addLineToPort(line: Line, port: StationPort) {
         this.ports.set(port, line);
     }
 

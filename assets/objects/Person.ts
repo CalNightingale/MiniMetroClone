@@ -39,7 +39,7 @@ export class Person {
 
     drawPassenger(p: p5, x: number, y: number, line: string) {
         let trainColor = p.color(line);
-        // Create the lighter color
+        // create lighter passenger color
         let passengerColor = p.lerpColor(trainColor, p.color('white'), Constants.PASSENGER_LIGHTNESS_FACTOR);
         this.visual.size = Constants.PERSON_SIZE * Constants.PASSENGER_SIZE_MULTIPLIER;
         this.visual.x = x;

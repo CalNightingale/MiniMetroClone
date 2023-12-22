@@ -43,13 +43,13 @@ export class Train {
             throw new Error(`Passenger grid too tall for train`);
         }
 
-        // Starting position for the grid
+        // get starting position of the grid
         let trainUpperLeftX = this.visual.x - Constants.TRAIN_LENGTH / 2;
         let trainUpperLeftY = this.visual.y - trainHeight / 2; 
         let startX = trainUpperLeftX + (Constants.TRAIN_LENGTH - gridWidth) / 2;
         let startY = trainUpperLeftY + (trainHeight - gridHeight) / 2;
 
-        // Draw the squares in a 2x3 grid
+        // draw passengers in a 2x3 grid
         let passengerIndex = 0;
         for (let row = 0; row < 2; row++) {
             for (let col = 0; col < 3; col++) {

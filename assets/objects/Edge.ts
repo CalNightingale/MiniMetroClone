@@ -2,20 +2,19 @@ import p5 from "p5";
 import { Station } from "./Station"
 import { StationPort } from "./StationPort";
 import { Constants } from "../constants";
+import { Line } from "./Line";
 
 export class Edge {
     from: Station; 
     to: Station;
-    line: string
     fromPort: StationPort;
     toPort: StationPort;
     jointX: number;
     jointY: number;
 
-    constructor(from: Station, to: Station, line: string) {
+    constructor(from: Station, to: Station) {
         this.from = from;
         this.to = to;
-        this.line = line;
         [this.fromPort, this.toPort, this.jointX, this.jointY] = this.computePorts();
     }
 
@@ -103,10 +102,6 @@ export class Edge {
             }
         }
 
-        // Update stations with the line
-        this.from.addLineToPort(this.line, fromPort);
-        this.to.addLineToPort(this.line, toPort);
-
         if (fromPort == StationPort.E || fromPort == StationPort.W) {
             // moving horizontally
             jointX = this.from.getCenterX() + dx-dy;
@@ -125,15 +120,10 @@ export class Edge {
     }
 
     draw(p: p5) {
-        p.push();
-        p.strokeWeight(Constants.EDGE_WIDTH)
-        p.stroke(this.line); // this.line is a string representing the line color
-
         // Draw the first line to the joint
         p.line(this.from.getCenterX(), this.from.getCenterY(), this.jointX, this.jointY);
 
         // Draw the second line from the joint to the destination
         p.line(this.jointX, this.jointY, this.to.getCenterX(), this.to.getCenterY());
-        p.pop();
     }
 }
