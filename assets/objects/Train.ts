@@ -67,18 +67,17 @@ export class Train {
             if (this.edge.to == nextEdge.to) {
                 console.log(`Edges in opposite directions`);
                 this.reversed = !this.reversed;
-                this.setMoveDir(Edge.getDirectionVector(nextEdge.toPort));
-                if (this.reversed) {
-                    this.visual.angle = nextEdge.targetAngle;
-                } else {
-                    this.visual.angle = nextEdge.originalAngle;
-                }  
+                this.invertMoveDirection();
             } else {
                 console.log(`Edges in same direction`);
-                // if edges are in same direction, continue
-                this.setMoveDir(Edge.getDirectionVector(nextEdge.fromPort));
-                this.visual.angle = nextEdge.originalAngle;
             }
+            this.setMoveDir(Edge.getDirectionVector(this.reversed ? nextEdge.toPort: nextEdge.fromPort));
+            // update movement direction 
+            if (this.reversed) {
+                this.visual.angle = nextEdge.targetAngle;
+            } else {
+                this.visual.angle = nextEdge.originalAngle;
+            }  
         }
         this.edge = nextEdge;
         this.reachedDest = false;
