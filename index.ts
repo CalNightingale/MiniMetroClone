@@ -18,16 +18,13 @@ import { Train } from "./assets/objects/Train";
         graph.addStation(stationA);
         graph.addStation(new Station(400, 400, StationType.Square, p));
         graph.addStation(new Station(600, 400, StationType.Triangle, p));
+        graph.addStation(new Station(700,200, StationType.Circle, p));
     };
   
     p.draw = () => {
         p.background('#fafafa');
         graph.draw(p);
     };
-
-    p.keyPressed = () => {
-      graph.keyPressed(p);
-    }
 
     p.mousePressed = () => {
       let clickedStation = graph.getStationAtMouse(p.mouseX, p.mouseY);

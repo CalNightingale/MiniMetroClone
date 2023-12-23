@@ -72,25 +72,6 @@ export class StationGraph {
         this.stations.forEach(station => station.draw(p));
     }
 
-    keyPressed(p: p5): void {
-        this.stations.forEach( (station) => {
-            switch (p.keyCode) {
-                case p.LEFT_ARROW:
-                  station.move(-5, 0);
-                  break;
-                case p.RIGHT_ARROW:
-                  station.move(5, 0);
-                  break;
-                case p.UP_ARROW:
-                  station.move(0, -5);
-                  break;
-                case p.DOWN_ARROW:
-                  station.move(0, 5);
-                  break;
-              }
-        })
-    }
-
     // Add these properties to the StationGraph class
     public isDragging: boolean = false;
     private dragStartStation: Station | null = null;

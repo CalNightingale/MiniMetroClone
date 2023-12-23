@@ -54,6 +54,10 @@ export class Edge {
         return port == StationPort.N || port == StationPort.E || port == StationPort.S || port == StationPort.W; 
     }
 
+    touchesStation(s: Station): boolean {
+        return s == this.to || s == this.from;
+    }
+
     /**
      * Find version of a given angle bounded by 0 and 2PI using recursion
      * @param angle potential unbounded angle
@@ -85,6 +89,7 @@ export class Edge {
         let jointY = this.from.getCenterY();
         let dx = this.to.x - this.from.x;
         let dy = this.to.y - this.from.y;
+        let amtLongerAxisIsLongerBy = Math.abs(Math.abs(dx)-Math.abs(dy));
 
         if (this.from.x === this.to.x) {
             // Vertical line
@@ -103,9 +108,13 @@ export class Edge {
                     if (Math.abs(dx) > Math.abs(dy)) {
                         // more east than south
                         fromPort = StationPort.E;
+                        jointX = this.from.getCenterX() + amtLongerAxisIsLongerBy;
+                        jointY = this.from.getCenterY();
                     } else {
                         // more south than east
                         fromPort = StationPort.S;
+                        jointX = this.from.getCenterX();
+                        jointY = this.from.getCenterY() + amtLongerAxisIsLongerBy;
                     }
                 } else {
                     // north(east)
@@ -113,9 +122,13 @@ export class Edge {
                     if (Math.abs(dx) > Math.abs(dy)) {
                         // more east than north
                         fromPort = StationPort.E;
+                        jointX = this.from.getCenterX() + amtLongerAxisIsLongerBy;
+                        jointY = this.from.getCenterY();
                     } else {
                         // more north than east
                         fromPort = StationPort.N;
+                        jointX = this.from.getCenterX();
+                        jointY = this.from.getCenterY() - amtLongerAxisIsLongerBy;
                     }
                 }
             } else {
@@ -126,9 +139,13 @@ export class Edge {
                     if (Math.abs(dx) > Math.abs(dy)) {
                         // more west than south
                         fromPort = StationPort.W;
+                        jointX = this.from.getCenterX() - amtLongerAxisIsLongerBy;
+                        jointY = this.from.getCenterY();
                     } else {
                         // more south than west
                         fromPort = StationPort.S;
+                        jointX = this.from.getCenterX();
+                        jointY = this.from.getCenterY() + amtLongerAxisIsLongerBy;
                     }
                 } else {
                     // north(west)
@@ -136,23 +153,16 @@ export class Edge {
                     if (Math.abs(dx) > Math.abs(dy)) {
                         // more west than north
                         fromPort = StationPort.W;
+                        jointX = this.from.getCenterX() - amtLongerAxisIsLongerBy;
+                        jointY = this.from.getCenterY();
                     } else {
                         // more north than west
                         fromPort = StationPort.N;
+                        jointX = this.from.getCenterX();
+                        jointY = this.from.getCenterY() - amtLongerAxisIsLongerBy;
                     }
                 }
             }
-        }
-
-        if (fromPort == StationPort.E || fromPort == StationPort.W) {
-            // moving horizontally
-            jointX = this.from.getCenterX() + dx-dy;
-            jointY = this.from.getCenterY();
-        } else if (fromPort == StationPort.N || fromPort == StationPort.S) {
-            jointX = this.from.getCenterX();
-            jointY = this.from.getCenterY() + dy-dx;
-        } else {
-            throw new Error("Bad edge direction vector");
         }
         return [fromPort, toPort, jointX, jointY];
     }
@@ -199,5 +209,9 @@ export class Edge {
 
         // Draw the second line from the joint to the destination
         p.line(this.jointX, this.jointY, this.to.getCenterX(), this.to.getCenterY());
+    }
+
+    toString(): string {
+        return `(${this.from.id}) -> (${this.to.id})`;
     }
 }

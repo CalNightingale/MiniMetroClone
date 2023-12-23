@@ -84,12 +84,6 @@ export class Station {
         return this.y + this.size/2;
     }
 
-    move(dx: number, dy: number): void {
-        this.x += dx;
-        this.y += dy;
-        this.visual.move(dx, dy)
-    }
-
     isMouseOver(x: number, y: number): boolean {
         return this.visual.isMouseOver(x, y);
     }
