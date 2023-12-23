@@ -163,7 +163,6 @@ export class Train {
         if (this.reachedDest) {
             throw new Error(`TRIED TO LOAD PASSENGERS BEFORE REROUTING`);
         }
-
     }
 
     draw(p: p5, trainColor: string) {

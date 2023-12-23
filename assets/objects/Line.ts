@@ -75,7 +75,7 @@ export class Line {
                 train.reroute(nextEdge);
                 
                 // load new passengers
-                //train.loadPassengers();
+                train.loadPassengers();
             }
         });
         //console.log(`Routing complete`);

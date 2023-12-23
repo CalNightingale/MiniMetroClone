@@ -1,0 +1,37 @@
+/* Add this inside a <style> tag in the <head> or in a separate .css file */
+
+/* Basic reset to remove padding, margin, and set box-sizing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Center the game canvas */
+#game-container {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background: linear-gradient(to right, #74ebd5, #acb6e5);
+}
+
+/* Style the title */
+h1 {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 2em;
+    color: #333;
+}
+
+/* Additional styles */
+canvas {
+    display: block; /* Remove inline spacing */
+    margin: auto; /* Center the canvas if it's not full screen */
+}
