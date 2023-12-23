@@ -45,8 +45,9 @@ export class Train {
     }
 
     // invert and return movement direction
-    invertMoveDirection(): {x: number, y: number}{
+    invertMoveDirection(): {x: number, y: number} {
         let newMD = {x: -this.moveDirection.x, y: -this.moveDirection.y};
+        console.log(`INVERTED MD; it is now ${newMD.x},${newMD.y}`);
         this.moveDirection = newMD;
         return this.moveDirection;
     } 
@@ -68,14 +69,13 @@ export class Train {
                 this.reversed = !this.reversed;
                 this.setMoveDir(Edge.getDirectionVector(nextEdge.toPort));
                 if (this.reversed) {
-                    this.invertMoveDirection();
                     this.visual.angle = nextEdge.targetAngle;
                 } else {
                     this.visual.angle = nextEdge.originalAngle;
                 }  
             } else {
                 console.log(`Edges in same direction`);
-            // if edges are in same direction, continue
+                // if edges are in same direction, continue
                 this.setMoveDir(Edge.getDirectionVector(nextEdge.fromPort));
                 this.visual.angle = nextEdge.originalAngle;
             }
@@ -85,7 +85,7 @@ export class Train {
         this.reachedJoint = false;
         this.lastDistToJoint = -1;
         this.framesAtStation = 0;
-        console.log(`after routing, edge is now ${this.edge}`);
+        console.log(`after routing, edge is now ${this.edge}. Moving in direction ${this.moveDirection.x}, ${this.moveDirection.y}`);
     }
 
     // move in {moveDirection} by {speed}
@@ -101,10 +101,10 @@ export class Train {
         }
         let distToJoint = this.edge.getDistToJoint(this.visual.x, this.visual.y);
         if (this.lastDistToJoint < 0) {
-            // do nothing
+            console.log(`Skipping joint detection; lastDist was 0`);
         } else if (distToJoint > this.lastDistToJoint && !this.reachedJoint) {
             // if we are getting farther from the joint, we must have passed it
-            console.log(`JOINT PASS DETECTED`);
+            console.log(`JOINT (${this.edge.jointX}, ${this.edge.jointY}) PASS DETECTED (curdist ${distToJoint} > lastdist ${this.lastDistToJoint})`);
             this.reachedJoint = true;
             let oppositeDir = Edge.getDirectionVector(this.reversed ? this.edge.fromPort : this.edge.toPort);
             let newDir = {x: oppositeDir.x * -1, y: oppositeDir.y * -1};

@@ -62,7 +62,7 @@ export class Line {
                 //train.loadPassengers();
             }
         });
-        console.log(`Routing complete`);
+        //console.log(`Routing complete`);
     }
 
     draw(p: p5): void {
