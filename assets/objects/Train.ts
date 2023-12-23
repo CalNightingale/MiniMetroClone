@@ -84,7 +84,7 @@ export class Train {
         this.reachedJoint = false;
         this.lastDistToJoint = -1;
         this.framesAtStation = 0;
-        console.log(`after routing, edge is now ${this.edge}. Moving in direction ${this.moveDirection.x}, ${this.moveDirection.y}`);
+        console.log(`after routing, edge is now ${this.edge}. Moving in direction ${this.moveDirection.x}, ${this.moveDirection.y} (at angle ${this.visual.angle})`);
     }
 
     // move in {moveDirection} by {speed}
@@ -126,8 +126,9 @@ export class Train {
                 transitionCompletionPct = 0.5 + distToJoint / Constants.TURN_SMOOTHING_THRESHOLD * 0.5;
             }
             // Linear interpolation of the angle
-            let interpAngle = this.edge.getInterpolatedAngle(transitionCompletionPct);
-            this.visual.angle = this.reversed ? this.edge.targetAngle - interpAngle : interpAngle;
+            let interpAngle = this.edge.getInterpolatedAngle(this.reversed ? 
+                1-transitionCompletionPct : transitionCompletionPct);
+            this.visual.angle = interpAngle;
         } else if (this.reachedJoint) {
             // clamp angle post-joint to exactly the target angle
             this.visual.angle = this.reversed ? this.edge.originalAngle : this.edge.targetAngle;

@@ -64,8 +64,8 @@ export class Edge {
      * @returns angle clamped in range
      */
     boundAngle(angle: number): number {
-        if (angle < 0) return this.boundAngle(angle + 2*Math.PI);
-        else if (angle > 2*Math.PI) return this.boundAngle(angle - 2*Math.PI);
+        if (angle < 0) return this.boundAngle(angle + Math.PI);
+        else if (angle > Math.PI) return this.boundAngle(angle - Math.PI);
         else return angle;
     }
     
@@ -74,6 +74,10 @@ export class Edge {
     }
 
     getInterpolatedAngle(pct: number) {
+        if (pct < 0 || pct >= 1) {
+            console.warn(`interpolation function received pct ${pct}`);
+        }
+        console.log(`OG Angle: ${this.originalAngle}, Target: ${this.targetAngle}`);
         return this.originalAngle + (this.targetAngle - this.originalAngle) * pct;
     }
 
