@@ -16,7 +16,11 @@ export class StationGraph {
         this.stations = [];
         this.edges = [];
         this.trains = [];
-        this.lines = [new Line('red'), new Line('green'), new Line('blue')];
+        this.lines = [new Line('red'), new Line('green'), new Line('blue'), 
+                      new Line('purple'), new Line('yellow')];
+        for (let i = 0; i < Constants.NUM_STARTING_LINES; i++) {
+            this.lines[i].unlock();
+        }
         this.activeLine = 0;
     }
 
@@ -65,11 +69,31 @@ export class StationGraph {
                     this.dragEndPoint.x, this.dragEndPoint.y);
         }
 
-        // then draw lines (lines handle trains)
+        // then draw lines
         this.lines.forEach(line => line.draw(p));
 
         // then draw stations
         this.stations.forEach(station => station.draw(p));
+
+        // finall menu
+        this.drawMenu(p);
+    }
+
+    drawMenu(p: p5) {
+        const lineMenuStartX = (1 - Constants.LINE_MENU_PCT_X) * Constants.CANVAS_WIDTH + Constants.LINE_MENU_SIZE/2;
+        const buffer = Constants.LINE_MENU_PCT_BUFFER * Constants.CANVAS_HEIGHT;
+        const menuHeight = this.lines.length * (Constants.LINE_MENU_SIZE + buffer); 
+        const lineMenuStartY = (Constants.CANVAS_HEIGHT - menuHeight) / 2;
+        p.push();
+        for (let i = 0; i < this.lines.length; i++) {
+            const curLine = this.lines[i];
+            let menuY = lineMenuStartY + i * (Constants.LINE_MENU_SIZE + buffer) + Constants.LINE_MENU_SIZE/2;
+            p.strokeWeight(0);
+            let icon = curLine.getMenuIcon();
+            p.fill(icon.color);
+            p.circle(lineMenuStartX, menuY, icon.size);
+        }
+        p.pop();
     }
 
     // Add these properties to the StationGraph class
@@ -81,7 +105,9 @@ export class StationGraph {
     startDrag(station: Station): void {
         this.isDragging = true;
         this.dragStartStation = station;
-        this.dragStartStation.setOutlineColor(this.lines[this.activeLine].getColor());
+        const activeLine = this.lines[this.activeLine];
+        this.dragStartStation.setOutlineColor(activeLine.getColor());
+        activeLine.hovered = true;
     }
 
     // Call this method when the drag ends
@@ -98,6 +124,7 @@ export class StationGraph {
             // add edge to graph
             this.addEdge(this.dragStartStation, endStation, this.lines[this.activeLine])
         }
+        this.lines[this.activeLine].hovered = false;
         this.dragStartStation = null;
         this.dragEndPoint = null;
     }

@@ -9,15 +9,31 @@ export class Line {
     private color: string;
     private edges: Edge[];
     private trains: Train[];
+    private unlocked: boolean;
+    hovered: boolean;
 
     constructor(color: string) {
         this.color = color;
         this.edges = [];
         this.trains = [];
+        this.unlocked = false;
+        this.hovered = false;
     }
 
     getColor(): string {
         return this.color;
+    }
+
+    unlock(): void {
+        this.unlocked = true;
+    }
+
+    getMenuIcon(): {size: number, color: string} {
+        if (!this.unlocked) 
+            return {size: Constants.LINE_MENU_SIZE * Constants.LINE_MENU_INACTIVE_MULTIPLIER, color: Constants.LOCKED_COLOR};
+        if (this.edges.length == 0 && !this.hovered) 
+            return {size: Constants.LINE_MENU_SIZE * Constants.LINE_MENU_INACTIVE_MULTIPLIER, color: this.getColor()};
+        return {size: Constants.LINE_MENU_SIZE, color: this.getColor()};
     }
 
     addEdge(edge: Edge) {
