@@ -11,30 +11,72 @@ export class Edge {
     toPort: StationPort;
     jointX: number;
     jointY: number;
+    jointPct: number;
+    totalLength: number;
+    originalAngle: number;
+    targetAngle: number;
 
     constructor(from: Station, to: Station) {
         this.from = from;
         this.to = to;
         [this.fromPort, this.toPort, this.jointX, this.jointY] = this.computePorts();
+        this.jointPct = this.getPctElapsed(this.jointX, this.jointY);
+        this.totalLength = this.getDistToJoint(this.from.x, this.from.y) + 
+                            this.getDistToJoint(this.to.x, this.to.y);
+        //console.log(`New edge has joint pct ${this.jointPct}`);
+        const oppositeDir = Edge.getDirectionVector(this.toPort);
+        const newDir = {x: oppositeDir.x * -1, y: oppositeDir.y * -1};
+        this.targetAngle = this.boundAngle(Edge.getAngleFromDirectionVector(newDir));
+        this.originalAngle = this.boundAngle(Edge.getAngleFromDirectionVector(Edge.getDirectionVector(this.fromPort)));
+        console.log(`Created new edge with fromPort ${this.fromPort} and toPort ${this.toPort}`)
     }
 
     // return dx, dy for vector
     static getDirectionVector(port: StationPort): {x: number, y: number}{
         switch (port) {
-            case StationPort.N:  return {x: 0, y: 1};
-            case StationPort.NE: return {x: 1, y: 1};
+            case StationPort.N:  return {x: 0, y: -1};
+            case StationPort.NE: return {x: 1, y: -1};
             case StationPort.E:  return {x: 1, y: 0};
-            case StationPort.SE: return {x: 1, y: -1};
-            case StationPort.S:  return {x: 0, y: -1};
-            case StationPort.SW: return {x: -1, y: -1};
+            case StationPort.SE: return {x: 1, y: 1};
+            case StationPort.S:  return {x: 0, y: 1};
+            case StationPort.SW: return {x: -1, y: 1};
             case StationPort.W:  return {x: -1, y: 0};
-            case StationPort.NW: return {x: -1, y: 1};
+            case StationPort.NW: return {x: -1, y: -1};
             default:             return {x: 0, y: 0};
         }
     }
 
+    static getAngleFromDirectionVector(vector: { x: number, y: number }): number {
+        return Math.atan2(vector.y, vector.x);
+    }
+
     static isCardinal(port: StationPort): boolean {
         return port == StationPort.N || port == StationPort.E || port == StationPort.S || port == StationPort.W; 
+    }
+
+    /**
+     * Find version of a given angle bounded by 0 and 2PI using recursion
+     * @param angle potential unbounded angle
+     * @returns angle clamped in range
+     */
+    boundAngle(angle: number): number {
+        if (angle < 0) return this.boundAngle(angle + 2*Math.PI);
+        else if (angle > 2*Math.PI) return this.boundAngle(angle - 2*Math.PI);
+        else return angle;
+    }
+    
+    getAngleDelta() {
+        return this.targetAngle - this.originalAngle;
+    }
+
+    getInterpolatedAngle(pct: number) {
+        return this.originalAngle + (this.targetAngle - this.originalAngle) * pct;
+    }
+
+    getDistToJoint(x: number, y: number) {
+        let dx = this.jointX - x;
+        let dy = this.jointY - y;
+        return Math.sqrt(dx*dx + dy*dy);
     }
 
     computePorts(): [StationPort, StationPort, number, number] {
@@ -115,8 +157,40 @@ export class Edge {
         return [fromPort, toPort, jointX, jointY];
     }
 
-    findJointPoints(): [number, number, number, number] {
-        return [0,0,0,0];
+    /**
+     * Assuming you began at this.from, determine whether (x,y) is along the path
+     * (falls on the line this.from -> (jointX, jointY) or line (jointX, jointY) -> this.to)
+     * If it does not, throw an error
+     * If it does, return the percentage of the edge that has been traversed
+     * @param x 
+     * @param y 
+     */
+    getPctElapsed(x: number, y: number): number {
+        // Helper function to calculate distance between two points
+        const dist = (x1: number, y1: number, x2: number, y2: number): number => {
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        };
+    
+        // Total length of the edge
+        const totalLength = dist(this.from.getCenterX(), this.from.getCenterY(), this.jointX, this.jointY) +
+                            dist(this.jointX, this.jointY, this.to.getCenterX(), this.to.getCenterY());
+    
+        // Distance from 'from' to the given point
+        const distFromStart = dist(this.from.getCenterX(), this.from.getCenterY(), x, y);
+        // Distance from the given point to 'to'
+        const distToEnd = dist(x, y, this.to.getCenterX(), this.to.getCenterY());
+    
+        // Check if the point lies on the line segment from 'from' to 'joint'
+        if (distFromStart + dist(x, y, this.jointX, this.jointY) === dist(this.from.getCenterX(), this.from.getCenterY(), this.jointX, this.jointY)) {
+            return distFromStart / totalLength;
+        }
+        // Check if the point lies on the line segment from 'joint' to 'to'
+        else if (dist(x, y, this.jointX, this.jointY) + distToEnd === dist(this.jointX, this.jointY, this.to.getCenterX(), this.to.getCenterY())) {
+            return (dist(this.from.getCenterX(), this.from.getCenterY(), this.jointX, this.jointY) + dist(x, y, this.jointX, this.jointY)) / totalLength;
+        }
+    
+        // If the point is not on either of the line segments
+        throw new Error("Point is not along the path of the edge");
     }
 
     draw(p: p5) {

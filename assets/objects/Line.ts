@@ -2,6 +2,8 @@ import p5 from "p5";
 import { Edge } from "./Edge";
 import { Constants } from "../constants";
 import { Train } from "./Train";
+import { Person } from "./Person";
+import { StationType } from "./StationType";
 
 export class Line {
     private color: string;
@@ -28,7 +30,8 @@ export class Line {
         edge.to.addLineToPort(this, edge.toPort);
         // If this is the first edge on this line (line was just created), add a train!
         if (this.edges.length == 1) {
-            let newTrain = new Train(edge.from, edge.fromPort);
+            let newTrain = new Train(edge);
+            newTrain.addPassenger(new Person(StationType.Triangle));
             this.trains.push(newTrain);
         }
     }
