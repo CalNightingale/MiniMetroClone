@@ -36,10 +36,36 @@ export class Line {
         }
     }
 
+    getNextEdge(train: Train): Edge {
+        let curEdge = train.edge;
+        this.edges.forEach(edge => {
+            if (edge.from == curEdge.to) {
+                return edge;
+            }
+        });
+        // if we get here we have failed to find a new edge, so we should go back the way we came
+        return curEdge;
+    }
+
     routeTrains() {
         this.trains.forEach(train => {
             if (train.reachedDest) {
-                console.log(`TRAIN REACHED DEST`);
+                let dest = train.getDestination();
+                console.log(`TRAIN REACHED DEST ${dest}`);
+                // remove passengers want to get off here
+                train.disembarkPassengers();
+                // TODO set train to new edge
+                let nextEdge = this.getNextEdge(train);
+                if (nextEdge == train.edge) {
+                    train.reversed = !train.reversed;
+                    train.invertMoveDirection();
+                } else {
+                    train.edge = nextEdge;
+                }
+                train.reset();
+                
+                // load new passengers
+                //train.loadPassengers();
             }
         });
     }

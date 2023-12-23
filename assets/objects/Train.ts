@@ -12,11 +12,12 @@ export class Train {
     private visual: TrainShape;
     private passengers: Person[];
     private moveDirection: {x: number, y: number} = {x: 0, y: 0};
-    private edge: Edge;
+    edge: Edge;
     private framesAtStation; // -1 if not at station, set to 0 if at station
     private reachedJoint: boolean;
     private lastDistToJoint: number;
     reachedDest: boolean;
+    reversed: boolean;
 
     constructor(edge: Edge) {
         // create visual
@@ -28,6 +29,7 @@ export class Train {
         // other initialization
         this.passengers = [];
         this.edge = edge;
+        this.reversed = false;
         this.setMoveDir(Edge.getDirectionVector(edge.fromPort));
         
         // movement-related stuff
@@ -41,6 +43,17 @@ export class Train {
         let magnitude = Math.sqrt(dir.x*dir.x + dir.y*dir.y);
         this.moveDirection = {x: dir.x/magnitude, y: dir.y/magnitude};
         console.log(this.moveDirection);
+    }
+
+    // invert and return movement direction
+    invertMoveDirection(): {x: number, y: number}{
+        let newMD = {x: -this.moveDirection.x, y: -this.moveDirection.y};
+        this.moveDirection = newMD;
+        return this.moveDirection;
+    } 
+
+    getDestination(): Station {
+        return this.edge.to;
     }
 
     // move in {moveDirection} by {speed}
@@ -61,7 +74,7 @@ export class Train {
             // if we are getting farther from the joint, we must have passed it
             console.log(`JOINT PASS DETECTED`);
             this.reachedJoint = true;
-            let oppositeDir = Edge.getDirectionVector(this.edge.toPort);
+            let oppositeDir = Edge.getDirectionVector(this.reversed ? this.edge.fromPort : this.edge.toPort);
             let newDir = {x: oppositeDir.x * -1, y: oppositeDir.y * -1};
             this.setMoveDir(newDir);
             this.visual.x = this.edge.jointX;
@@ -82,21 +95,50 @@ export class Train {
                 transitionCompletionPct = 0.5 + distToJoint / Constants.TURN_SMOOTHING_THRESHOLD * 0.5;
             }
             // Linear interpolation of the angle
-            this.visual.angle = this.edge.getInterpolatedAngle(transitionCompletionPct);
-        } else if (this.reachedJoint){
-            this.visual.angle = this.edge.targetAngle;
+            let interpAngle = this.edge.getInterpolatedAngle(transitionCompletionPct);
+            this.visual.angle = this.reversed ? this.edge.targetAngle - interpAngle : interpAngle;
+        } else if (this.reachedJoint) {
+            // clamp angle post-joint to exactly the target angle
+            this.visual.angle = this.reversed ? this.edge.originalAngle : this.edge.targetAngle;
         }
 
         // if we've passed the joint and are now as far or farther than the to station, we're there!
-        if (this.reachedJoint && distToJoint >= this.edge.getDistToJoint(this.edge.to.getCenterX(), 
-                                                                         this.edge.to.getCenterY())) {
+        const passedJointAndOutOfRange = this.reversed ?
+            this.reachedJoint && distToJoint >= this.edge.getDistToJoint(this.edge.from.getCenterX(), 
+                                                                        this.edge.from.getCenterY()) :
+            this.reachedJoint && distToJoint >= this.edge.getDistToJoint(this.edge.to.getCenterX(), 
+                                                                        this.edge.to.getCenterY());
+        if (passedJointAndOutOfRange) {
             this.reachedDest = true;
-            this.visual.x = this.edge.to.getCenterX();
-            this.visual.y = this.edge.to.getCenterY();
+            this.visual.x = this.reversed ? this.edge.from.getCenterX() : this.edge.to.getCenterX();
+            this.visual.y = this.reversed ? this.edge.from.getCenterY() : this.edge.to.getCenterY();
         } else {
             this.visual.x += this.moveDirection.x * Constants.TRAIN_SPEED;
             this.visual.y += this.moveDirection.y * Constants.TRAIN_SPEED;
         }
+    }
+
+    reset() {
+        this.reachedDest = false;
+        this.reachedJoint = false;
+        this.lastDistToJoint = -1;
+    }
+
+    disembarkPassengers() {
+        if (!this.reachedDest) {
+            throw new Error(`TRIED TO DISEMBARK PASSENGERS BEFORE REACHING DESTINATION`);
+        }
+        // filter out the passengers whose destination matches the current station's type
+        this.passengers = this.passengers.filter(passenger => {
+            return passenger.destination != this.getDestination().stationType;
+        });
+    }
+
+    loadPassengers() {
+        if (this.reachedDest) {
+            throw new Error(`TRIED TO LOAD PASSENGERS BEFORE REROUTING`);
+        }
+
     }
 
     draw(p: p5, trainColor: string) {
