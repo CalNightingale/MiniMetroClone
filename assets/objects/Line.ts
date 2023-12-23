@@ -36,7 +36,16 @@ export class Line {
         }
     }
 
+    routeTrains() {
+        this.trains.forEach(train => {
+            if (train.reachedDest) {
+                console.log(`TRAIN REACHED DEST`);
+            }
+        });
+    }
+
     draw(p: p5): void {
+        this.routeTrains();
         p.push();
         // first draw edges
         p.strokeWeight(Constants.EDGE_WIDTH)

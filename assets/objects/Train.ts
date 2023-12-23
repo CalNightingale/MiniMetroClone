@@ -16,6 +16,7 @@ export class Train {
     private framesAtStation; // -1 if not at station, set to 0 if at station
     private reachedJoint: boolean;
     private lastDistToJoint: number;
+    reachedDest: boolean;
 
     constructor(edge: Edge) {
         // create visual
@@ -32,6 +33,7 @@ export class Train {
         // movement-related stuff
         this.framesAtStation = 0;
         this.reachedJoint = false;
+        this.reachedDest = false;
         this.lastDistToJoint = -1;
     }
 
@@ -81,14 +83,24 @@ export class Train {
             }
             // Linear interpolation of the angle
             this.visual.angle = this.edge.getInterpolatedAngle(transitionCompletionPct);
+        } else if (this.reachedJoint){
+            this.visual.angle = this.edge.targetAngle;
         }
 
-        this.visual.x += this.moveDirection.x * Constants.TRAIN_SPEED;
-        this.visual.y += this.moveDirection.y * Constants.TRAIN_SPEED;
+        // if we've passed the joint and are now as far or farther than the to station, we're there!
+        if (this.reachedJoint && distToJoint >= this.edge.getDistToJoint(this.edge.to.getCenterX(), 
+                                                                         this.edge.to.getCenterY())) {
+            this.reachedDest = true;
+            this.visual.x = this.edge.to.getCenterX();
+            this.visual.y = this.edge.to.getCenterY();
+        } else {
+            this.visual.x += this.moveDirection.x * Constants.TRAIN_SPEED;
+            this.visual.y += this.moveDirection.y * Constants.TRAIN_SPEED;
+        }
     }
 
     draw(p: p5, trainColor: string) {
-        this.move();
+        if (!this.reachedDest) this.move();
         p.push();
         p.translate(this.visual.x, this.visual.y);
         p.rotate(this.visual.angle);
