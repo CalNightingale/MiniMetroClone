@@ -24,7 +24,8 @@ import { Train } from "./assets/objects/Train";
     };
   
     p.draw = () => {
-        p.background('#fafafa');
+        //p.background('#fafafa'); // <- uncomment to draw gray background for bounding purposes
+        p.clear();
         graph.draw(p);
     };
 
