@@ -18,12 +18,18 @@ export class Train {
     private lastDistToJoint: number;
 
     constructor(edge: Edge) {
+        // create visual
         let x = edge.from.getCenterX();
         let y = edge.from.getCenterY();
         this.visual = new TrainShape(x, y);
+        this.visual.angle = edge.originalAngle;
+
+        // other initialization
         this.passengers = [];
         this.edge = edge;
         this.setMoveDir(Edge.getDirectionVector(edge.fromPort));
+        
+        // movement-related stuff
         this.framesAtStation = 0;
         this.reachedJoint = false;
         this.lastDistToJoint = -1;
