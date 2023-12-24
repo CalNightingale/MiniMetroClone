@@ -59,13 +59,13 @@ export class Edge {
     }
 
     /**
-     * Find version of a given angle bounded by 0 and 2PI using recursion
+     * Find version of a given angle bounded between -PI/2 and PI/2 using recursion
      * @param angle potential unbounded angle
      * @returns angle clamped in range
      */
     boundAngle(angle: number): number {
-        if (angle < 0) return this.boundAngle(angle + Math.PI);
-        else if (angle > Math.PI) return this.boundAngle(angle - Math.PI);
+        if (angle < -Math.PI/2) return this.boundAngle(angle + Math.PI);
+        else if (angle > Math.PI/2) return this.boundAngle(angle - Math.PI);
         else return angle;
     }
     
