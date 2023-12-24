@@ -49,9 +49,14 @@ export class StationGraph {
         }
 
         if (!edgeExists) {
-            console.log(`Adding edge from ${fromStation.toString()} to ${toStation.toString()}`);
+            // if an edge exists that ends at toStation, we should flip the direction
+            // of the new edge
+            const flipDirection = this.lines[this.activeLine].hasEdgeEndingAtStation(toStation);
+            const correctedTo = flipDirection ? fromStation : toStation;
+            const correctedFrom = flipDirection ? toStation : fromStation;
+            console.log(`Adding edge from ${correctedFrom.toString()} to ${correctedTo.toString()}`);
             // update station ports
-            let newEdge = new Edge(fromStation, toStation);
+            let newEdge = new Edge(correctedFrom, correctedTo);
             this.lines[this.activeLine].addEdge(newEdge);
             // add to logical edge list
             this.edges.push(newEdge);

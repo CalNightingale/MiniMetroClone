@@ -4,6 +4,7 @@ import { Constants } from "../constants";
 import { Train } from "./Train";
 import { Person } from "./Person";
 import { StationType } from "./StationType";
+import { Station } from "./Station";
 
 export class Line {
     private color: string;
@@ -51,6 +52,10 @@ export class Line {
             this.trains.push(newTrain);
         }
     }
+
+    hasEdgeEndingAtStation(station: Station): boolean {
+        return this.edges.some(edge => edge.to == station);
+    } 
 
     getNextEdge(train: Train): Edge {
         let curEdge = train.edge;
