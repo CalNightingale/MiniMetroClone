@@ -8,7 +8,7 @@ import { Station } from "./Station";
 
 export class Line {
     private color: string;
-    private edges: Edge[];
+    edges: Edge[];
     private trains: Train[];
     private unlocked: boolean;
     hovered: boolean;
@@ -27,6 +27,14 @@ export class Line {
 
     unlock(): void {
         this.unlocked = true;
+    }
+
+    isUnlocked(): boolean {
+        return this.unlocked;
+    }
+
+    isInService(): boolean {
+        return this.edges.length > 0;
     }
 
     getMenuIcon(): {size: number, color: string} {
@@ -55,7 +63,11 @@ export class Line {
 
     hasEdgeEndingAtStation(station: Station): boolean {
         return this.edges.some(edge => edge.to == station);
-    } 
+    }
+
+    servesStation(station: Station): boolean {
+        return this.edges.some(edge => edge.to == station || edge.from == station);
+    }
 
     getNextEdge(train: Train): Edge {
         let curEdge = train.edge;
@@ -97,6 +109,10 @@ export class Line {
         this.trains.forEach(train => train.draw(p, this.getColor()));
         p.pop();
         this.routeTrains();
+    }
+
+    toString(): string {
+        return `${this.color}`;
     }
 
 }

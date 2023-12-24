@@ -47,6 +47,29 @@ export class Station {
         }
     }
 
+    getLineForNewEdge(): Line | null {
+        const lineUsageCount = new Map<Line, number>();
+    
+        // Count the number of ports used by each line
+        this.ports.forEach((line) => {
+            if (line !== null) {
+                lineUsageCount.set(line, (lineUsageCount.get(line) || 0) + 1);
+            }
+        });
+    
+        // Find and return the first line that uses only one port
+        for (let [line, count] of lineUsageCount) {
+            if (count === 1) {
+                return line;
+            }
+        }
+    
+        // If no line uses only one port, return null
+        return null;
+    }
+    
+    
+
     addLineToPort(line: Line, port: StationPort) {
         this.ports.set(port, line);
     }

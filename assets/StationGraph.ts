@@ -5,16 +5,17 @@ import { Edge } from './objects/Edge';
 import { Train } from './objects/Train';
 import { Line } from './objects/Line';
 
+type Drag = {startStation: Station | null, line: Line | null};
+
 export class StationGraph {
     private stations: Station[];
-    private edges: Edge[];
     private lines: Line[];
     private trains: Train[];
     private activeLine: number;
+    private activeDrag: Drag;
 
     constructor() {
         this.stations = [];
-        this.edges = [];
         this.trains = [];
         this.lines = [new Line('red'), new Line('green'), new Line('blue'), 
                       new Line('purple'), new Line('yellow')];
@@ -22,10 +23,16 @@ export class StationGraph {
             this.lines[i].unlock();
         }
         this.activeLine = 0;
+        this.activeDrag = {startStation: null, line: null};
     }
 
     getActiveLine(): Line | null {
-        if (this.lines.length == 0) return null;
+        let totalNumEdges = 0;
+        this.lines.forEach(line => {
+            if (line.isInService()) {
+                totalNumEdges += line.edges.length;
+            } });
+        if (totalNumEdges == 0) return null;
         return this.lines[this.activeLine];
     }
 
@@ -37,16 +44,16 @@ export class StationGraph {
     }
 
     addEdge(fromStation: Station, toStation: Station, line: Line): void {
-        // Check if the edge already exists in either direction
-        const edgeExists = this.edges.some(edge =>
-            (edge.from === fromStation && edge.to === toStation) ||
-            (edge.from === toStation && edge.to === fromStation)
-        );
-
         if (fromStation == toStation) {
             console.log(`Ignoring self-edge at station ${fromStation.toString()}`)
             return;
         }
+
+        // Check if the edge already exists in either direction
+        const edgeExists = this.lines[this.activeLine].edges.some(edge =>
+            (edge.from === fromStation && edge.to === toStation) ||
+            (edge.from === toStation && edge.to === fromStation)
+        );
 
         if (!edgeExists) {
             // if an edge exists that ends at toStation, we should flip the direction
@@ -57,9 +64,7 @@ export class StationGraph {
             console.log(`Adding edge from ${correctedFrom.toString()} to ${correctedTo.toString()}`);
             // update station ports
             let newEdge = new Edge(correctedFrom, correctedTo);
-            this.lines[this.activeLine].addEdge(newEdge);
-            // add to logical edge list
-            this.edges.push(newEdge);
+            line.addEdge(newEdge);
         } else {
             console.log(`Edge from ${fromStation.toString()} to ${toStation.toString()} already exists.`);
         }
@@ -67,12 +72,7 @@ export class StationGraph {
 
     draw(p: p5): void {
         // draw line if dragging
-        p.strokeWeight(Constants.EDGE_WIDTH);
-        if (this.isDragging && this.dragStartStation && this.dragEndPoint) {
-            p.stroke(this.lines[this.activeLine].getColor());
-            p.line(this.dragStartStation.getCenterX(), this.dragStartStation.getCenterY(), 
-                    this.dragEndPoint.x, this.dragEndPoint.y);
-        }
+        this.drawDragLine(p);
 
         // then draw lines
         this.lines.forEach(line => line.draw(p));
@@ -80,8 +80,17 @@ export class StationGraph {
         // then draw stations
         this.stations.forEach(station => station.draw(p));
 
-        // finall menu
+        // finally menu
         this.drawMenu(p);
+    }
+
+    drawDragLine(p: p5) {
+        p.strokeWeight(Constants.EDGE_WIDTH);
+        if (this.isDragging && this.activeDrag.line && this.activeDrag.startStation && this.dragEndPoint) {
+            p.stroke(this.activeDrag.line.getColor());
+            p.line(this.activeDrag.startStation.getCenterX(), this.activeDrag.startStation.getCenterY(), 
+                    this.dragEndPoint.x, this.dragEndPoint.y);
+        }
     }
 
     drawMenu(p: p5) {
@@ -101,36 +110,55 @@ export class StationGraph {
         p.pop();
     }
 
+    getNextUnusedLine(): Line | null {
+        for(let line of this.lines) {
+            if (line.isUnlocked() && !line.isInService()) return line;
+        }
+        return null;
+    }
+
     // Add these properties to the StationGraph class
     public isDragging: boolean = false;
-    private dragStartStation: Station | null = null;
     private dragEndPoint: { x: number, y: number } | null = null;
+
+    getLineForEdge(station: Station): Line | null {
+        // if station has no edges, return the current active line
+        const openStationLine = station.getLineForNewEdge();
+        if (openStationLine) return openStationLine;
+        // if we get here, return the next available line (or null)
+        return this.getNextUnusedLine();
+    }
 
     // Call this method when a drag starts
     startDrag(station: Station): void {
+        this.activeDrag = {startStation: station, line: this.getLineForEdge(station)};
+        if (!this.activeDrag.line) {
+            return;
+        }
         this.isDragging = true;
-        this.dragStartStation = station;
-        const activeLine = this.lines[this.activeLine];
-        this.dragStartStation.setOutlineColor(activeLine.getColor());
-        activeLine.hovered = true;
+        this.activeDrag.line.hovered = true;
+        
+        station.setOutlineColor(this.activeDrag.line.getColor());
+        console.log(`STARTING A DRAG WITH LINE ${this.activeDrag.line}`);
     }
 
     // Call this method when the drag ends
     endDrag(endStation: Station | undefined): void {
         this.isDragging = false;
-        if (this.dragStartStation) {
-            this.dragStartStation.setOutlineColor('black');
-        }
+        // edge case where drag call is from click not on a start station
+        if (!this.activeDrag.line || !this.activeDrag.startStation) {
+            return;
+        } 
+        this.activeDrag.line.hovered = false;
+        this.activeDrag.startStation.setOutlineColor('black');
         if (endStation) {
             // reset end station color
             endStation.setOutlineColor('black');
+            // create new edge
+            this.addEdge(this.activeDrag.startStation, endStation, this.activeDrag.line);
         }
-        if (this.dragStartStation && endStation) {
-            // add edge to graph
-            this.addEdge(this.dragStartStation, endStation, this.lines[this.activeLine])
-        }
-        this.lines[this.activeLine].hovered = false;
-        this.dragStartStation = null;
+        // reset drag variables
+        this.activeDrag = {startStation: null, line: null};
         this.dragEndPoint = null;
     }
 
@@ -138,14 +166,14 @@ export class StationGraph {
     updateDragPoint(x: number, y: number): void {
         if (this.isDragging) {
             let hoveredStation = this.getStationAtMouse(x, y);
-            if (hoveredStation) {
-                hoveredStation.setOutlineColor(this.lines[this.activeLine].getColor());
+            if (hoveredStation && this.activeDrag.line) {
+                hoveredStation.setOutlineColor(this.activeDrag.line.getColor());
             } else {
                 // either we've never hovered, or we used to be and no longer are
                 let oldHoveredStation = null;
                 if (this.dragEndPoint) {
                     oldHoveredStation = this.getStationAtMouse(this.dragEndPoint.x, this.dragEndPoint.y);
-                    if (oldHoveredStation && oldHoveredStation != this.dragStartStation) {
+                    if (oldHoveredStation && oldHoveredStation != this.activeDrag.startStation) {
                         oldHoveredStation.setOutlineColor('black');
                     }
                 }
