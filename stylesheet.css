@@ -43,6 +43,7 @@ h2 {
     max-width: 1000px; /* or the max width you want for your game */
     min-height: 600px;
     margin: 0 auto;
+    border: 5px solid #333;
 }
 
 /* Additional styles */
