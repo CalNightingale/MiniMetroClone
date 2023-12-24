@@ -1,0 +1,2 @@
+*{box-sizing:border-box;margin:0;padding:0}body,html{height:100%;font-family:Arial,sans-serif}#background-wrapper{background:linear-gradient(90deg,#74ebd5,#acb6e5);flex-direction:column;justify-content:center;align-items:center;height:100%;display:flex}h1{text-align:center;color:#333;margin:20px 0;font-size:2em}h2{text-align:center;color:#333;margin:20px 0;font-size:1.6em}#gameCanvas{border:5px solid #333;width:100%;max-width:1000px;min-height:600px;margin:0 auto}canvas{margin:auto;display:block}
+/*# sourceMappingURL=index.0c64a187.css.map */
