@@ -7,6 +7,7 @@ import { Line } from "./Line";
 export class Edge {
     from: Station; 
     to: Station;
+    line: Line;
     fromPort: StationPort;
     toPort: StationPort;
     jointX: number;
@@ -16,9 +17,10 @@ export class Edge {
     originalAngle: number;
     targetAngle: number;
 
-    constructor(from: Station, to: Station) {
+    constructor(from: Station, to: Station, line: Line) {
         this.from = from;
         this.to = to;
+        this.line = line;
         [this.fromPort, this.toPort, this.jointX, this.jointY] = this.computePorts();
         this.jointPct = this.getPctElapsed(this.jointX, this.jointY);
         this.totalLength = this.getDistToJoint(this.from.x, this.from.y) + 

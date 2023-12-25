@@ -26,6 +26,23 @@ export class StationGraph {
         this.activeDrag = {startStation: null, line: null};
     }
 
+    /**
+     * Returns a list of all edges accessible from a given station.
+     * @param station Station to check
+     * @returns Array of Edge objects
+     */
+    getEdgesAccessibleFromStation(station: Station): Edge[] {
+        let edges = [];
+        for (let line of this.lines) {
+            for (let edge of line.edges) {
+                if (edge.touchesStation(station)) {
+                    edges.push(edge);
+                }
+            }
+        }
+        return edges;
+    }
+
     getActiveLine(): Line | null {
         let totalNumEdges = 0;
         this.lines.forEach(line => {
@@ -41,6 +58,13 @@ export class StationGraph {
             throw new Error(`Station with id ${station.id} already exists.`);
         }
         this.stations.push(station);
+    }
+
+    recalculatePassengerRoutes(): void {
+        console.log(`RECALCULATING PASSENGER ROUTES`);
+        for (let station of this.stations) {
+            station.recalculatePassengerRoutes(this);
+        }
     }
 
     addEdge(fromStation: Station, toStation: Station, line: Line): void {
@@ -63,8 +87,9 @@ export class StationGraph {
             const correctedFrom = flipDirection ? toStation : fromStation;
             console.log(`Adding edge from ${correctedFrom.toString()} to ${correctedTo.toString()}`);
             // update station ports
-            let newEdge = new Edge(correctedFrom, correctedTo);
+            let newEdge = new Edge(correctedFrom, correctedTo, line);
             line.addEdge(newEdge);
+            this.recalculatePassengerRoutes();
         } else {
             console.log(`Edge from ${fromStation.toString()} to ${toStation.toString()} already exists.`);
         }

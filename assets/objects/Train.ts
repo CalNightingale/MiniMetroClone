@@ -39,6 +39,10 @@ export class Train {
         this.lastDistToJoint = -1;
     }
 
+    getLine(): Line {
+        return this.edge.line;
+    }
+
     setMoveDir(dir: {x: number, y: number}): void {
         let magnitude = Math.sqrt(dir.x*dir.x + dir.y*dir.y);
         this.moveDirection = {x: dir.x/magnitude, y: dir.y/magnitude};
@@ -47,7 +51,7 @@ export class Train {
     // invert and return movement direction
     invertMoveDirection(): {x: number, y: number} {
         let newMD = {x: -this.moveDirection.x, y: -this.moveDirection.y};
-        console.log(`INVERTED MD; it is now ${newMD.x},${newMD.y}`);
+        //console.log(`INVERTED MD; it is now ${newMD.x},${newMD.y}`);
         this.moveDirection = newMD;
         return this.moveDirection;
     } 
@@ -57,19 +61,15 @@ export class Train {
     }
 
     reroute(nextEdge: Edge): void {
-        console.log(`REROUTE CALL RECEIVED EDGE ${nextEdge} (current edge: ${this.edge})`);
+        //console.log(`REROUTE CALL RECEIVED EDGE ${nextEdge} (current edge: ${this.edge})`);
         if (nextEdge == this.edge) {
             this.reversed = !this.reversed;
-            console.log(`staying on same edge. Reversed is now ${this.reversed}`);
+            //console.log(`staying on same edge. Reversed is now ${this.reversed}`);
             this.invertMoveDirection();
         } else {
             // if edges are in opposite directions, must flip reverse
             if (this.edge.to == nextEdge.to) {
-                console.log(`Edges in opposite directions`);
-                this.reversed = !this.reversed;
-                this.invertMoveDirection();
-            } else {
-                console.log(`Edges in same direction`);
+                throw new Error(`Edges in opposite directions`);
             }
             this.setMoveDir(Edge.getDirectionVector(this.reversed ? nextEdge.toPort: nextEdge.fromPort));
             // update movement direction 
@@ -84,7 +84,7 @@ export class Train {
         this.reachedJoint = false;
         this.lastDistToJoint = -1;
         this.framesAtStation = 0;
-        console.log(`after routing, edge is now ${this.edge}. Moving in direction ${this.moveDirection.x}, ${this.moveDirection.y} (at angle ${this.visual.angle})`);
+        //console.log(`after routing, edge is now ${this.edge}. Moving in direction ${this.moveDirection.x}, ${this.moveDirection.y} (at angle ${this.visual.angle})`);
     }
 
     // move in {moveDirection} by {speed}
@@ -100,10 +100,10 @@ export class Train {
         }
         let distToJoint = this.edge.getDistToJoint(this.visual.x, this.visual.y);
         if (this.lastDistToJoint < 0) {
-            console.log(`Skipping joint detection; lastDist was 0`);
+            //console.log(`Skipping joint detection; lastDist was 0`);
         } else if (distToJoint > this.lastDistToJoint && !this.reachedJoint) {
             // if we are getting farther from the joint, we must have passed it
-            console.log(`JOINT (${this.edge.jointX}, ${this.edge.jointY}) PASS DETECTED (curdist ${distToJoint} > lastdist ${this.lastDistToJoint})`);
+            //console.log(`JOINT (${this.edge.jointX}, ${this.edge.jointY}) PASS DETECTED (curdist ${distToJoint} > lastdist ${this.lastDistToJoint})`);
             this.reachedJoint = true;
             let oppositeDir = Edge.getDirectionVector(this.reversed ? this.edge.fromPort : this.edge.toPort);
             let newDir = {x: oppositeDir.x * -1, y: oppositeDir.y * -1};
@@ -139,7 +139,7 @@ export class Train {
             this.edge.getDistToJoint(this.getDestination().getCenterX(), 
             this.getDestination().getCenterY());
         if (passedJointAndOutOfRange) {
-            console.log(`DESTINATION REACHED`);
+            //console.log(`DESTINATION REACHED`);
             this.reachedDest = true;
             this.visual.x = this.getDestination().getCenterX();
             this.visual.y = this.getDestination().getCenterY();
@@ -149,20 +149,40 @@ export class Train {
         }
     }
 
-    disembarkPassengers() {
+    disembarkPassengers(station: Station): void {
         if (!this.reachedDest) {
-            throw new Error(`TRIED TO DISEMBARK PASSENGERS BEFORE REACHING DESTINATION`);
+            throw new Error(`TRIED TO DISEMBARK PASSENGERS WITH DESTINATION UNREACHED`);
         }
         // filter out the passengers whose destination matches the current station's type
         this.passengers = this.passengers.filter(passenger => {
-            return passenger.destination != this.getDestination().stationType;
+            return passenger.destination != station.stationType;
         });
     }
 
-    loadPassengers() {
+    loadPassengers(station: Station): void {
+        console.log(`LOADING PASSENGERS AT STATION ${station}`);
         if (this.reachedDest) {
-            throw new Error(`TRIED TO LOAD PASSENGERS BEFORE REROUTING`);
+            throw new Error(`TRIED TO LOAD PASSENGERS WITH DESTINATION REACHED (should reroute first)`);
         }
+        // Temporary array to hold passengers who will be boarding the train
+        let boardingPassengers: Person[] = [];
+
+        // Iterate over all people at the station
+        station.people = station.people.filter(person => {
+            // Check if the person's target line and reversed state match the train's
+            console.log(`checking person ${person}`);
+            if (person.targetLine === this.getLine() && person.isReversed === this.reversed) {
+                // Add the person to the train's passengers
+                boardingPassengers.push(person);
+                // Do not keep this person in the station's people list
+                return false;
+            }
+            // Keep the person in the station's people list
+            return true;
+        });
+
+        // Add all boarding passengers to the train's passengers
+        this.passengers.push(...boardingPassengers);
     }
 
     draw(p: p5, trainColor: string) {

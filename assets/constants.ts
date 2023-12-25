@@ -22,7 +22,7 @@ export const Constants = {
     TRAIN_ASPECT: 0.6,
     PASSENGER_SIZE_MULTIPLIER: 0.7,
     PASSENGER_LIGHTNESS_FACTOR: 0.7,
-    TRAIN_SPEED:1, // pixels per frame
+    TRAIN_SPEED:2, // pixels per frame
     STATION_PAUSE_LENGTH: 50, // frames
     TURN_SMOOTHING_THRESHOLD: 10 // pixels
 };

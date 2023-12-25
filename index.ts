@@ -16,7 +16,7 @@ import { Train } from "./assets/objects/Train";
         //console.log(canvas.parent());
         graph = new StationGraph;
         let stationA = new Station(100, 100, StationType.Circle, p);
-        stationA.addPerson(new Person(StationType.Triangle));
+        stationA.addPerson(new Person(StationType.Triangle), graph);
         graph.addStation(stationA);
         graph.addStation(new Station(400, 400, StationType.Square, p));
         graph.addStation(new Station(600, 400, StationType.Triangle, p));

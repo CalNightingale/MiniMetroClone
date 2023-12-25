@@ -56,7 +56,6 @@ export class Line {
         // If this is the first edge on this line (line was just created), add a train!
         if (this.edges.length == 1) {
             let newTrain = new Train(edge);
-            newTrain.addPassenger(new Person(StationType.Triangle));
             this.trains.push(newTrain);
         }
     }
@@ -85,17 +84,15 @@ export class Line {
     routeTrains() {
         this.trains.forEach(train => {
             if (train.reachedDest) {
-                // remove passengers want to get off here
-                train.disembarkPassengers();
-                // TODO set train to new edge
+                const stationTrainIsAt = train.getDestination();
+                train.disembarkPassengers(stationTrainIsAt);
                 let nextEdge = this.getNextEdge(train);
                 train.reroute(nextEdge);
-                
-                // load new passengers
-                train.loadPassengers();
+                // must load after rerouting to ensure that passengers board
+                // trains going the proper direction
+                train.loadPassengers(stationTrainIsAt);
             }
         });
-        //console.log(`Routing complete`);
     }
 
     draw(p: p5): void {

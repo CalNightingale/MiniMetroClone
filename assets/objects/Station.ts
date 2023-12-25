@@ -8,6 +8,7 @@ import { Square } from '../shapes/Square';
 import { Person } from './Person';
 import { StationPort } from './StationPort';
 import { Line } from './Line';
+import { StationGraph } from '../StationGraph';
 
 export class Station {
     static lastID = 0;
@@ -17,7 +18,7 @@ export class Station {
     id: number;
     size: number;
     private visual: Shape;
-    private people: Person[];
+    people: Person[];
     stationType: StationType;
     outlineColor: string;
     private ports: Map<StationPort, Line | null>;
@@ -45,6 +46,16 @@ export class Station {
                 this.visual = new Triangle(x, y, this.size, 'white');
                 break;
         }
+    }
+
+    getLines(): Line[] {
+        let lines: Line[] = [];
+        this.ports.forEach((line) => {
+            if (line !== null && !lines.includes(line)) {
+                lines.push(line);
+            }
+        });
+        return lines;
     }
 
     getLineForNewEdge(): Line | null {
@@ -111,9 +122,18 @@ export class Station {
         return this.visual.isMouseOver(x, y);
     }
 
-    addPerson(person: Person): void {
+    addPerson(person: Person, graph: StationGraph): void {
         console.log(`Adding person ${person.toString()} to station ${this.toString()}`)
         this.people.push(person);
+        person.calculateTargetStation(this, graph);
+    }
+
+    recalculatePassengerRoutes(graph: StationGraph): void {
+        for (let person of this.people) {
+            console.log(`STATION REROUTING PASSENGER ${person}`);
+            person.calculateTargetStation(this, graph);
+            console.log(`PERSON ${person} taking ${person.targetLine} (reversed: ${person.isReversed}) to ${person.targetStation}`);
+        }
     }
 
     removePerson(): Person | undefined {
