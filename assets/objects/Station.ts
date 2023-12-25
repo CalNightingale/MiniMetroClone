@@ -129,9 +129,8 @@ export class Station {
 
     recalculatePassengerRoutes(graph: StationGraph): void {
         for (let person of this.people) {
-            console.log(`STATION REROUTING PASSENGER ${person}`);
             person.calculateTargetStation(this, graph);
-            console.log(`PERSON ${person} taking ${person.targetLine} (reversed: ${person.isReversed}) to ${person.targetStation}`);
+            //console.log(`PERSON ${person} taking ${person.targetLine} (reversed: ${person.isReversed}) to ${person.targetStation}`);
         }
     }
 
