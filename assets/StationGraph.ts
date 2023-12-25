@@ -100,7 +100,7 @@ export class StationGraph {
         this.drawDragLine(p);
 
         // then draw lines
-        this.lines.forEach(line => line.draw(p));
+        this.lines.forEach(line => line.draw(p, this));
 
         // then draw stations
         this.stations.forEach(station => station.draw(p));

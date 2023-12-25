@@ -7,6 +7,7 @@ import { Station } from "./Station";
 import { Line } from "./Line";
 import { StationPort } from "./StationPort";
 import { Edge } from "./Edge";
+import { StationGraph } from "../StationGraph";
 
 export class Train {
     private visual: TrainShape;
@@ -149,13 +150,27 @@ export class Train {
         }
     }
 
-    disembarkPassengers(station: Station): void {
+    disembarkPassengers(station: Station, graph: StationGraph): void {
         if (!this.reachedDest) {
             throw new Error(`TRIED TO DISEMBARK PASSENGERS WITH DESTINATION UNREACHED`);
         }
+
+        let transferringPassengers: Person[] = [];
         // filter out the passengers whose destination matches the current station's type
         this.passengers = this.passengers.filter(passenger => {
-            return passenger.destination != station.stationType;
+            if (passenger.targetStation == station) {
+                if (passenger.destination == station.stationType) {
+                    // passenger reached destination!
+                    // TODO some sort of score increment here
+                } else {
+                    // must be a transfer! re-add person to station
+                    station.addPerson(passenger, graph);
+                }
+                // do not keep this person
+                return false;
+            }
+            // filter disembarkers out of passenger list
+            return true;
         });
     }
 
@@ -170,7 +185,6 @@ export class Train {
         // Iterate over all people at the station
         station.people = station.people.filter(person => {
             // Check if the person's target line and reversed state match the train's
-            console.log(`checking person ${person}`);
             if (person.targetLine === this.getLine() && person.isReversed === this.reversed) {
                 // Add the person to the train's passengers
                 boardingPassengers.push(person);

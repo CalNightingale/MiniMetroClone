@@ -5,6 +5,7 @@ import { Train } from "./Train";
 import { Person } from "./Person";
 import { StationType } from "./StationType";
 import { Station } from "./Station";
+import { StationGraph } from "../StationGraph";
 
 export class Line {
     private color: string;
@@ -81,11 +82,11 @@ export class Line {
         return nextEdge;
     }
 
-    routeTrains() {
+    routeTrains(graph: StationGraph) {
         this.trains.forEach(train => {
             if (train.reachedDest) {
                 const stationTrainIsAt = train.getDestination();
-                train.disembarkPassengers(stationTrainIsAt);
+                train.disembarkPassengers(stationTrainIsAt, graph);
                 let nextEdge = this.getNextEdge(train);
                 train.reroute(nextEdge);
                 // must load after rerouting to ensure that passengers board
@@ -95,7 +96,7 @@ export class Line {
         });
     }
 
-    draw(p: p5): void {
+    draw(p: p5, graph: StationGraph): void {
         p.push();
         // first draw edges
         p.strokeWeight(Constants.EDGE_WIDTH)
@@ -105,7 +106,7 @@ export class Line {
         // now draw trains
         this.trains.forEach(train => train.draw(p, this.getColor()));
         p.pop();
-        this.routeTrains();
+        this.routeTrains(graph);
     }
 
     toString(): string {
