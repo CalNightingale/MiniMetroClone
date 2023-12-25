@@ -154,8 +154,6 @@ export class Train {
         if (!this.reachedDest) {
             throw new Error(`TRIED TO DISEMBARK PASSENGERS WITH DESTINATION UNREACHED`);
         }
-
-        let transferringPassengers: Person[] = [];
         // filter out the passengers whose destination matches the current station's type
         this.passengers = this.passengers.filter(passenger => {
             if (passenger.targetStation == station) {
@@ -175,6 +173,9 @@ export class Train {
     }
 
     loadPassengers(station: Station): void {
+        if (station.people.length < 1) {
+            return;
+        }
         console.log(`LOADING PASSENGERS AT STATION ${station}`);
         if (this.reachedDest) {
             throw new Error(`TRIED TO LOAD PASSENGERS WITH DESTINATION REACHED (should reroute first)`);
@@ -184,8 +185,10 @@ export class Train {
 
         // Iterate over all people at the station
         station.people = station.people.filter(person => {
+            console.log(`CHECKING ${person}`);
             // Check if the person's target line and reversed state match the train's
             if (person.targetLine === this.getLine() && person.isReversed === this.reversed) {
+                console.log(`FOUND PERSON ${person}`);
                 // Add the person to the train's passengers
                 boardingPassengers.push(person);
                 // Do not keep this person in the station's people list

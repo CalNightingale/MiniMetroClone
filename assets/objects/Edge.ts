@@ -79,7 +79,6 @@ export class Edge {
         if (pct < 0 || pct >= 1) {
             console.warn(`interpolation function received pct ${pct}`);
         }
-        console.log(`OG Angle: ${this.originalAngle}, Target: ${this.targetAngle}`);
         return this.originalAngle + (this.targetAngle - this.originalAngle) * pct;
     }
 

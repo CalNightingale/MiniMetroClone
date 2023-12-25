@@ -123,9 +123,8 @@ export class Station {
     }
 
     addPerson(person: Person, graph: StationGraph): void {
-        console.log(`Adding person ${person.toString()} to station ${this.toString()}`)
         this.people.push(person);
-        person.calculateTargetStation(this, graph);
+        this.recalculatePassengerRoutes(graph);
     }
 
     recalculatePassengerRoutes(graph: StationGraph): void {

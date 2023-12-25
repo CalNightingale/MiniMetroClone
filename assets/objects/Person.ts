@@ -37,25 +37,32 @@ export class Person {
 
     calculateTargetStation(startStation: Station, graph: StationGraph): void {
         const visited = new Set<Station>();
-        const queue: Array<{ currentStation: Station, edge: Edge | null, transferStation: Station | null, currentLines: Set<Line> }> = [];
+        const queue: Array<{
+            currentStation: Station, 
+            edge: Edge | null, 
+            transferStation: Station | null, 
+            currentLines: Set<Line>,
+            firstEdge: Edge | null
+        }> = [];
         const startLines = new Set(startStation.getLines());
 
-        queue.push({ currentStation: startStation, edge: null, transferStation: null, currentLines: startLines });
+        queue.push({
+            currentStation: startStation, 
+            edge: null, 
+            transferStation: null, 
+            currentLines: startLines,
+            firstEdge: null
+        });
         visited.add(startStation);
 
         while (queue.length > 0) {
-            const { currentStation, edge, transferStation, currentLines } = queue.shift()!;
+            const { currentStation, edge, transferStation, currentLines, firstEdge } = queue.shift()!;
 
             // Check if station type matches destination
             if (currentStation.stationType === this.destination) {
-                if (currentStation == startStation) throw new Error(`Person trying to route to a stationtype they're already at`);
                 this.targetStation = transferStation ?? currentStation;
-                if (edge == null) {
-                    throw new Error(`Null edge on solution!`);
-                }
-                // Set targetLine to the line of the first edge from the start station
-                this.targetLine = this.targetStation === startStation ? edge.line : startStation.getLines()[0];
-                this.isReversed = edge ? edge.from === currentStation : false;
+                this.targetLine = firstEdge ? firstEdge.line : null;
+                this.isReversed = firstEdge ? firstEdge.to === startStation : false;
                 return;
             }
 
@@ -69,17 +76,19 @@ export class Person {
                     const nextStationLines = new Set(nextStation.getLines());
                     const isTransfer = ![...currentLines].some(line => nextStationLines.has(line));
                     const newTransferStation = isTransfer ? currentStation : transferStation;
+                    const newFirstEdge = firstEdge || (isTransfer ? null : nextEdge);
                     queue.push({ 
                         currentStation: nextStation,
                         edge: nextEdge,
                         transferStation: newTransferStation,
-                        currentLines: isTransfer ? nextStationLines : currentLines
+                        currentLines: isTransfer ? nextStationLines : currentLines,
+                        firstEdge: newFirstEdge
                     });
                 }
             }
         }
 
-        // If no station found, target station remains null
+        // If no station found, target station and other properties remain null
         this.targetStation = null;
         this.targetLine = null;
         this.isReversed = false;
@@ -93,6 +102,7 @@ export class Person {
         this.visual.x = x;
         this.visual.y = y;
         this.visual.size = Constants.PERSON_SIZE;
+        this.visual.color = 'black';
         this.visual.draw(p);
     }
 
