@@ -52,8 +52,8 @@ export class Line {
         }
         this.edges.push(edge);
         // Update stations with the line
-        edge.from.addLineToPort(this, edge.fromPort);
-        edge.to.addLineToPort(this, edge.toPort);
+        edge.from.addEdgeToPort(edge, edge.fromPort);
+        edge.to.addEdgeToPort(edge, edge.toPort);
         // If this is the first edge on this line (line was just created), add a train!
         if (this.edges.length == 1) {
             let newTrain = new Train(edge);

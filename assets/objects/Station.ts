@@ -9,6 +9,7 @@ import { Person } from './Person';
 import { StationPort } from './StationPort';
 import { Line } from './Line';
 import { StationGraph } from '../StationGraph';
+import { Edge } from './Edge';
 
 export class Station {
     static lastID = 0;
@@ -21,7 +22,7 @@ export class Station {
     people: Person[];
     stationType: StationType;
     outlineColor: string;
-    private ports: Map<StationPort, Line | null>;
+    private ports: Map<StationPort, Edge[]>;
 
     constructor(x: number, y: number, stationType: StationType, p: p5) {
         this.x = x;
@@ -30,9 +31,8 @@ export class Station {
         this.stationType = stationType;
         this.outlineColor = 'black';
         this.people = [];
-        // populate ports
-        this.ports = new Map<StationPort, Line | null>;
-        Object.keys(StationPort).forEach((key, index) => {this.ports.set(index, null)});
+        // populate ports with empty arrays
+        this.ports = new Map<StationPort, Edge[]>();
 
         this.id = Station.lastID++; // Assign a unique ID to the station.
         switch (this.stationType) {
@@ -50,11 +50,12 @@ export class Station {
 
     getLines(): Line[] {
         let lines: Line[] = [];
-        this.ports.forEach((line) => {
-            if (line !== null && !lines.includes(line)) {
-                lines.push(line);
-            }
-        });
+        this.ports.forEach((edgeList) => {
+            edgeList.forEach(edge => { 
+                if (!lines.includes(edge.line)) {
+                    lines.push(edge.line);
+                }
+            })})
         return lines;
     }
 
@@ -62,10 +63,12 @@ export class Station {
         const lineUsageCount = new Map<Line, number>();
     
         // Count the number of ports used by each line
-        this.ports.forEach((line) => {
-            if (line !== null) {
-                lineUsageCount.set(line, (lineUsageCount.get(line) || 0) + 1);
-            }
+        this.ports.forEach((edgeList) => {
+            edgeList.forEach(edge => {
+                if (edge.line !== null) {
+                    lineUsageCount.set(edge.line, (lineUsageCount.get(edge.line) || 0) + 1);
+                }
+            })
         });
     
         // Find and return the first line that uses only one port
@@ -81,8 +84,17 @@ export class Station {
     
     
 
-    addLineToPort(line: Line, port: StationPort) {
-        this.ports.set(port, line);
+    addEdgeToPort(edge: Edge, port: StationPort) {
+        let portEdges = this.ports.get(port);
+        if (portEdges) {
+            // if the port has been initialized already, append
+            portEdges.push(edge);
+            this.ports.set(port, portEdges);
+        } else {
+            // otherwise make a new list
+            this.ports.set(port, [edge]);
+        }
+        
     }
 
     setOutlineColor(newColor: string): void {
