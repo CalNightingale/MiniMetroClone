@@ -32,8 +32,8 @@ export class Edge {
         //console.log(`New edge has joint pct ${this.jointPct}`);
         const oppositeDir = Edge.getDirectionVector(this.toPort);
         const newDir = {x: oppositeDir.x * -1, y: oppositeDir.y * -1};
-        this.targetAngle = Edge.getAngle(this.toPort, false);
-        this.originalAngle = Edge.getAngle(this.fromPort, false);
+        this.targetAngle = Edge.getAngle(this.toPort);
+        this.originalAngle = Edge.getAngle(this.fromPort);
         console.log(`Created new edge with fromPort ${this.fromPort} (${this.originalAngle}) and toPort ${this.toPort} (${this.targetAngle})`)
     }
 
@@ -52,9 +52,8 @@ export class Edge {
         }
     }
 
-    static getAngle(port: StationPort, reversed: boolean): number {
+    static getAngle(port: StationPort): number {
         let res: number;
-        
         switch (port) {
             case StationPort.N:  res = Math.PI/2;
             break;
