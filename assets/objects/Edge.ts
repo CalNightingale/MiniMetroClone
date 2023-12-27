@@ -34,6 +34,12 @@ export class Edge {
         const newDir = {x: oppositeDir.x * -1, y: oppositeDir.y * -1};
         this.targetAngle = Edge.getAngle(this.toPort);
         this.originalAngle = Edge.getAngle(this.fromPort);
+        if (Math.abs(this.originalAngle) == Math.PI/2) {
+            const angleDiff = Math.abs(this.targetAngle - this.originalAngle);
+            if (angleDiff > Math.PI/4) {
+                this.originalAngle *= -1;
+            }
+        }
         console.log(`Created new edge with fromPort ${this.fromPort} (${this.originalAngle}) and toPort ${this.toPort} (${this.targetAngle})`)
     }
 
@@ -126,7 +132,7 @@ export class Edge {
             console.warn(`interpolation function received pct ${pct}`);
         }
         const angleDiff = this.targetAngle - this.originalAngle;
-        if (Math.abs(angleDiff) != Math.PI/4) {
+        if (Math.abs(angleDiff) != Math.PI/4 && Math.abs(angleDiff) != 0) {
             console.error(`Difference between target and original angle is ${angleDiff}`);
         }
         return this.originalAngle + (this.targetAngle - this.originalAngle) * pct;
