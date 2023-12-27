@@ -63,7 +63,7 @@ export class Edge {
             break;
             case StationPort.SE: res = Math.PI/4;
             break;
-            case StationPort.S:  res = Math.PI/2;
+            case StationPort.S:  res = -Math.PI/2;
             break;
             case StationPort.SW: res = -Math.PI/4;
             break;
