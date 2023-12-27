@@ -29,8 +29,8 @@ export class StationGraph {
     }
 
     populateStations(numStations: number, p: p5): void {
-        const canvasWidth = Constants.CANVAS_WIDTH - Constants.LINE_MENU_SIZE;
-        const canvasHeight = Constants.CANVAS_HEIGHT;
+        const canvasWidth = Constants.CANVAS_WIDTH - Constants.LINE_MENU_SIZE - Constants.CANVAS_EDGE_BUFFER;
+        const canvasHeight = Constants.CANVAS_HEIGHT - Constants.CANVAS_EDGE_BUFFER;
         const stationSize = Constants.STATION_SIZE;
         const proxyThreshold = Constants.STATION_PROXY_THRESHOLD;
     

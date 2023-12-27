@@ -2,6 +2,7 @@ export const Constants = {
     // CANVAS
     CANVAS_WIDTH: 800,
     CANVAS_HEIGHT: 600,
+    CANVAS_EDGE_BUFFER: 50,
     // STATIONS
     STATION_SIZE: 40,
     STATION_OUTLINE: 10,
