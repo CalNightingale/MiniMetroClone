@@ -6,6 +6,7 @@ export const Constants = {
     STATION_SIZE: 40,
     STATION_OUTLINE: 10,
     NUM_STATIONS: 7,
+    STATION_PROXY_THRESHOLD: 40,
     // MENU STUFF
     LINE_MENU_PCT_X: 0.1,
     LINE_MENU_PCT_BUFFER: 0.02,

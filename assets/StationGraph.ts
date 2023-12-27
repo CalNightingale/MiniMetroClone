@@ -32,6 +32,7 @@ export class StationGraph {
         const canvasWidth = Constants.CANVAS_WIDTH - Constants.LINE_MENU_SIZE;
         const canvasHeight = Constants.CANVAS_HEIGHT;
         const stationSize = Constants.STATION_SIZE;
+        const proxyThreshold = Constants.STATION_PROXY_THRESHOLD;
     
         // Map to keep track of station type counts
         const stationTypeCounts = new Map<StationType, number>();
@@ -42,7 +43,7 @@ export class StationGraph {
     
         for (let i = 0; i < numStations; i++) {
             let validPosition = false;
-            let x=0, y=0;
+            let x = 0, y = 0;
     
             while (!validPosition) {
                 const gridX = i % gridSize;
@@ -51,8 +52,19 @@ export class StationGraph {
                 x = gridX * cellWidth + Math.random() * (cellWidth - stationSize) + stationSize / 2;
                 y = gridY * cellHeight + Math.random() * (cellHeight - stationSize) + stationSize / 2;
     
+                // Check for horizontal or vertical proximity to existing stations
+                for (const station of this.stations) {
+                    if (Math.abs(station.x - x) < proxyThreshold) {
+                        x = station.x; // Align horizontally
+                    }
+                    if (Math.abs(station.y - y) < proxyThreshold) {
+                        y = station.y; // Align vertically
+                    }
+                }
+    
                 validPosition = true;
     
+                // Check for overlap with existing stations
                 for (const station of this.stations) {
                     const dx = station.x - x;
                     const dy = station.y - y;
@@ -74,6 +86,7 @@ export class StationGraph {
             stationTypeCounts.set(stationType, (stationTypeCounts.get(stationType) || 0) + 1);
         }
     }
+    
     
 
     /**
