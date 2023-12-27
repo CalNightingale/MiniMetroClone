@@ -14,13 +14,7 @@ import { Train } from "./assets/objects/Train";
         let canvas = p.createCanvas(Constants.CANVAS_WIDTH, Constants.CANVAS_HEIGHT);
         canvas.parent('gameCanvas');
         //console.log(canvas.parent());
-        graph = new StationGraph;
-        let stationA = new Station(100, 100, StationType.Circle, p);
-        stationA.addPerson(new Person(StationType.Triangle), graph);
-        graph.addStation(stationA);
-        graph.addStation(new Station(400, 400, StationType.Square, p));
-        graph.addStation(new Station(600, 400, StationType.Triangle, p));
-        graph.addStation(new Station(600,200, StationType.Circle, p));
+        graph = new StationGraph(p);
     };
   
     p.draw = () => {

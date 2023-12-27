@@ -45,8 +45,7 @@ export class Train {
     }
 
     setMoveDir(dir: {x: number, y: number}): void {
-        let magnitude = Math.sqrt(dir.x*dir.x + dir.y*dir.y);
-        this.moveDirection = {x: dir.x/magnitude, y: dir.y/magnitude};
+        this.moveDirection = Edge.normalizeVector(dir);
     }
 
     // invert and return movement direction

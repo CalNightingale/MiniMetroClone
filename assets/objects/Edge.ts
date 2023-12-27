@@ -1,7 +1,6 @@
 import p5 from "p5";
 import { Station } from "./Station"
 import { StationPort } from "./StationPort";
-import { Constants } from "../constants";
 import { Line } from "./Line";
 
 export class Edge {
@@ -16,11 +15,16 @@ export class Edge {
     totalLength: number;
     originalAngle: number;
     targetAngle: number;
+    toOffset: {x: number, y: number};
+    fromOffset: {x: number, y: number};
 
     constructor(from: Station, to: Station, line: Line) {
         this.from = from;
         this.to = to;
         this.line = line;
+        // offsets at each station, an
+        this.toOffset = {x: 0, y: 0};
+        this.fromOffset = {x: 0, y: 0};
         [this.fromPort, this.toPort, this.jointX, this.jointY] = this.computePorts();
         this.jointPct = this.getPctElapsed(this.jointX, this.jointY);
         this.totalLength = this.getDistToJoint(this.from.x, this.from.y) + 
@@ -48,6 +52,11 @@ export class Edge {
         }
     }
 
+    static normalizeVector(vector: { x: number, y: number }): { x: number, y: number } {
+        const magnitude = Math.sqrt(vector.x*vector.x + vector.y*vector.y);
+        return {x: vector.x/magnitude, y: vector.y/magnitude};
+    } 
+
     static getAngleFromDirectionVector(vector: { x: number, y: number }): number {
         return Math.atan2(vector.y, vector.x);
     }
@@ -58,6 +67,20 @@ export class Edge {
 
     touchesStation(s: Station): boolean {
         return s == this.to || s == this.from;
+    }
+
+    getJointPos(): {x: number, y: number} {
+        return {x: this.jointX + this.toOffset.x + this.fromOffset.x,
+                y: this.jointY + this.toOffset.y + this.fromOffset.y};
+    }
+
+    setOffset(offset: {x: number, y: number}, station: Station): void {
+        console.log(`OFFSET SET CALL ${offset.x}, ${offset.y}`);
+        if (station == this.to) {
+            this.toOffset = offset;
+        } else if (station == this.from) {
+            this.fromOffset = offset;
+        } else throw new Error(`Edge ${this} attempted to add offset to station ${station}`);        
     }
 
     /**
@@ -83,8 +106,9 @@ export class Edge {
     }
 
     getDistToJoint(x: number, y: number) {
-        let dx = this.jointX - x;
-        let dy = this.jointY - y;
+        const jointPos = this.getJointPos();
+        const dx = jointPos.x - x;
+        const dy = jointPos.y - y;
         return Math.sqrt(dx*dx + dy*dy);
     }
 
@@ -92,9 +116,9 @@ export class Edge {
         let fromPort: StationPort, toPort: StationPort;
         let jointX = this.from.getCenterX();
         let jointY = this.from.getCenterY();
-        let dx = this.to.x - this.from.x;
-        let dy = this.to.y - this.from.y;
-        let amtLongerAxisIsLongerBy = Math.abs(Math.abs(dx)-Math.abs(dy));
+        const dx = this.to.x - this.from.x;
+        const dy = this.to.y - this.from.y;
+        const amtLongerAxisIsLongerBy = Math.abs(Math.abs(dx)-Math.abs(dy));
 
         if (this.from.x === this.to.x) {
             // Vertical line
@@ -104,6 +128,25 @@ export class Edge {
             // Horizontal line
             fromPort = this.from.x < this.to.x ? StationPort.E : StationPort.W;
             toPort = this.from.x < this.to.x ? StationPort.W : StationPort.E;
+        } else if (dx === dy) {
+            // west to east
+            if (this.from.x < this.to.x) { // NW to SE
+                if (this.from.y < this.to.y) {
+                    fromPort = StationPort.SE;
+                    toPort = StationPort.NW;
+                } else { // SW TO NE
+                    fromPort = StationPort.NE;
+                    toPort = StationPort.SW;
+                }
+            } else {
+                if (this.from.y < this.to.y) { // NE TO SW
+                    fromPort = StationPort.SW;
+                    toPort = StationPort.NE;
+                } else { // SE to NW
+                    fromPort = StationPort.NW;
+                    toPort = StationPort.SE;
+                }
+            }
         } else {
             if (dx > 0) {
                 // east
@@ -209,11 +252,12 @@ export class Edge {
     }
 
     draw(p: p5) {
+        const jointPos = this.getJointPos();
         // Draw the first line to the joint
-        p.line(this.from.getCenterX(), this.from.getCenterY(), this.jointX, this.jointY);
+        p.line(this.from.getCenterX(), this.from.getCenterY(), jointPos.x, jointPos.y);
 
         // Draw the second line from the joint to the destination
-        p.line(this.jointX, this.jointY, this.to.getCenterX(), this.to.getCenterY());
+        p.line(jointPos.x, jointPos.y, this.to.getCenterX(), this.to.getCenterY());
     }
 
     toString(): string {

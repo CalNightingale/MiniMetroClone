@@ -35,8 +35,10 @@ export class Station {
         this.ports = new Map<StationPort, Edge[]>();
 
         this.id = Station.lastID++; // Assign a unique ID to the station.
+        console.log(`creating station of type ${this.stationType}`);
         switch (this.stationType) {
             case StationType.Circle:
+                console.log(`theoretically valid visual created`);
                 this.visual = new Circle(x, y, this.size/2, 'white');
                 break;
             case StationType.Square:
@@ -45,6 +47,8 @@ export class Station {
             case StationType.Triangle:
                 this.visual = new Triangle(x, y, this.size, 'white');
                 break;
+            default:
+                throw new Error(`INVALID STATION TYPE: ${this.stationType}`);
         }
     }
 
@@ -82,19 +86,21 @@ export class Station {
         return null;
     }
     
-    
+    resolveEdgeOverlaps(): void {
+        // TODO
+    }
 
     addEdgeToPort(edge: Edge, port: StationPort) {
         let portEdges = this.ports.get(port);
         if (portEdges) {
             // if the port has been initialized already, append
             portEdges.push(edge);
-            this.ports.set(port, portEdges);
         } else {
             // otherwise make a new list
-            this.ports.set(port, [edge]);
+            portEdges = [edge];
         }
-        
+        this.ports.set(port, portEdges);
+        this.resolveEdgeOverlaps();
     }
 
     setOutlineColor(newColor: string): void {

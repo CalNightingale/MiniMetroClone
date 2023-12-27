@@ -4,6 +4,7 @@ import { Constants } from './constants';
 import { Edge } from './objects/Edge';
 import { Train } from './objects/Train';
 import { Line } from './objects/Line';
+import { StationType, getRandomStationType } from './objects/StationType';
 
 type Drag = {startStation: Station | null, line: Line | null};
 
@@ -14,7 +15,7 @@ export class StationGraph {
     private activeLine: number;
     private activeDrag: Drag;
 
-    constructor() {
+    constructor(p: p5) {
         this.stations = [];
         this.trains = [];
         this.lines = [new Line('red'), new Line('green'), new Line('blue'), 
@@ -24,7 +25,56 @@ export class StationGraph {
         }
         this.activeLine = 0;
         this.activeDrag = {startStation: null, line: null};
+        this.populateStations(Constants.NUM_STATIONS, p);
     }
+
+    populateStations(numStations: number, p: p5): void {
+        const canvasWidth = Constants.CANVAS_WIDTH - Constants.LINE_MENU_SIZE;
+        const canvasHeight = Constants.CANVAS_HEIGHT;
+        const stationSize = Constants.STATION_SIZE;
+    
+        // Map to keep track of station type counts
+        const stationTypeCounts = new Map<StationType, number>();
+    
+        const gridSize = Math.ceil(Math.sqrt(numStations));
+        const cellWidth = canvasWidth / gridSize;
+        const cellHeight = canvasHeight / gridSize;
+    
+        for (let i = 0; i < numStations; i++) {
+            let validPosition = false;
+            let x=0, y=0;
+    
+            while (!validPosition) {
+                const gridX = i % gridSize;
+                const gridY = Math.floor(i / gridSize);
+    
+                x = gridX * cellWidth + Math.random() * (cellWidth - stationSize) + stationSize / 2;
+                y = gridY * cellHeight + Math.random() * (cellHeight - stationSize) + stationSize / 2;
+    
+                validPosition = true;
+    
+                for (const station of this.stations) {
+                    const dx = station.x - x;
+                    const dy = station.y - y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < stationSize) {
+                        validPosition = false;
+                        break;
+                    }
+                }
+            }
+    
+            // Get a station type biased towards underrepresented types
+            const stationType = getRandomStationType(stationTypeCounts);
+    
+            const newStation = new Station(x, y, stationType, p); // Assuming p5 instance is available
+            this.addStation(newStation);
+    
+            // Update station type count
+            stationTypeCounts.set(stationType, (stationTypeCounts.get(stationType) || 0) + 1);
+        }
+    }
+    
 
     /**
      * Returns a list of all edges accessible from a given station.
