@@ -5,6 +5,7 @@ import { Edge } from './objects/Edge';
 import { Train } from './objects/Train';
 import { Line } from './objects/Line';
 import { StationType, getRandomStationType } from './objects/StationType';
+import { Person } from './objects/Person';
 
 type Drag = {startStation: Station | null, line: Line | null};
 
@@ -14,6 +15,7 @@ export class StationGraph {
     private trains: Train[];
     private activeLine: number;
     private activeDrag: Drag;
+    private timeSinceSpawn: number;
 
     constructor(p: p5) {
         this.stations = [];
@@ -25,11 +27,12 @@ export class StationGraph {
         }
         this.activeLine = 0;
         this.activeDrag = {startStation: null, line: null};
+        this.timeSinceSpawn = Constants.SPAWN_RATE;
         this.populateStations(Constants.NUM_STATIONS, p);
     }
 
     populateStations(numStations: number, p: p5): void {
-        const canvasWidth = Constants.CANVAS_WIDTH - Constants.LINE_MENU_SIZE - Constants.CANVAS_EDGE_BUFFER;
+        const canvasWidth = (1 - Constants.LINE_MENU_PCT_BUFFER) * Constants.CANVAS_WIDTH - Constants.CANVAS_EDGE_BUFFER - Constants.LINE_MENU_SIZE;
         const canvasHeight = Constants.CANVAS_HEIGHT - Constants.CANVAS_EDGE_BUFFER;
         const stationSize = Constants.STATION_SIZE;
         const proxyThreshold = Constants.STATION_PROXY_THRESHOLD;
@@ -158,7 +161,43 @@ export class StationGraph {
         }
     }
 
+    getValidSpawnStations(): Station[] {
+        let validStations: Station[] = [];
+        this.stations.forEach(station => {
+            if (!station.isAtCapacity()) validStations.push(station);
+        });
+        return validStations;
+    }
+
+    handleSpawning(): void {
+        this.timeSinceSpawn++;
+        if (this.timeSinceSpawn >= Constants.SPAWN_RATE) {
+            this.timeSinceSpawn = 0;
+
+            const validStations = this.getValidSpawnStations();
+            if (validStations.length == 0) return;
+            // Select a random station for the person to spawn at
+            const spawnStationIndex = Math.floor(Math.random() * validStations.length);
+            const spawnStation = validStations[spawnStationIndex];
+    
+            // Select a random destination station type different from the spawn station
+            let destinationType: StationType;
+            do {
+                destinationType = getRandomStationType(new Map());
+            } while (destinationType === spawnStation.stationType);
+    
+            // Create a new person with the destination type
+            const newPerson = new Person(destinationType);
+                
+            // Add new person to station
+            spawnStation.addPerson(newPerson, this);
+        }
+    }
+
     draw(p: p5): void {
+        // first handle spawning
+        this.handleSpawning();
+
         // draw line if dragging
         this.drawDragLine(p);
 

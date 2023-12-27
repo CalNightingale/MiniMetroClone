@@ -7,7 +7,9 @@ export const Constants = {
     STATION_SIZE: 40,
     STATION_OUTLINE: 10,
     NUM_STATIONS: 7,
-    STATION_PROXY_THRESHOLD: 40,
+    STATION_PROXY_THRESHOLD: 80,
+    STATION_CAPACITY: 8,
+    STATION_ROW_CAP: 4,
     // MENU STUFF
     LINE_MENU_PCT_X: 0.1,
     LINE_MENU_PCT_BUFFER: 0.02,
@@ -19,9 +21,10 @@ export const Constants = {
     EDGE_WIDTH: 15,
     // PEOPLE
     PERSON_SIZE: 12.5,
-    PERSON_XOFFSET: 10,
-    PERSON_YOFFSET: 10,
+    PERSON_XOFFSET: 5,
+    PERSON_YOFFSET: 5,
     PERSON_OFFSET: 5, // TODO REMOVE X and Y OFFSET, just use this
+    SPAWN_RATE: 200, // frames
     // TRAINS
     TRAIN_LENGTH: 50,
     TRAIN_ASPECT: 0.6,

@@ -119,11 +119,14 @@ export class Station {
     drawPeople(p: p5): void {
         p.strokeWeight(0);
         p.fill('black');
+        const startX = this.x + this.size + Constants.PERSON_XOFFSET;
+        const startY = this.y - this.size/2;
         for (let i = 0; i < this.people.length; i++) {
-            let personToDraw = this.people[i];
-            let personX = this.x + this.size + Constants.PERSON_XOFFSET * (i+1) 
-                                + Constants.PERSON_SIZE * i;
-            let personY = this.y - Constants.PERSON_SIZE; // TODO MULTIROW???
+            const personToDraw = this.people[i];
+            const yOffset = i < Constants.STATION_ROW_CAP ? 0 : 1;
+            const personY = startY + (Constants.PERSON_SIZE+Constants.PERSON_YOFFSET) * yOffset;
+            const xOffset = i < Constants.STATION_ROW_CAP ? i : i - Constants.STATION_ROW_CAP;
+            const personX = startX + (Constants.PERSON_SIZE+Constants.PERSON_XOFFSET) * xOffset;
             personToDraw.drawWaiting(p, personX, personY);
         }
     }
@@ -143,6 +146,10 @@ export class Station {
     addPerson(person: Person, graph: StationGraph): void {
         this.people.push(person);
         this.recalculatePassengerRoutes(graph);
+    }
+
+    isAtCapacity(): boolean {
+        return this.people.length >= Constants.STATION_CAPACITY;
     }
 
     recalculatePassengerRoutes(graph: StationGraph): void {
