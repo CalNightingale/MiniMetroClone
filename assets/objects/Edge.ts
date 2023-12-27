@@ -32,9 +32,9 @@ export class Edge {
         //console.log(`New edge has joint pct ${this.jointPct}`);
         const oppositeDir = Edge.getDirectionVector(this.toPort);
         const newDir = {x: oppositeDir.x * -1, y: oppositeDir.y * -1};
-        this.targetAngle = this.boundAngle(Edge.getAngleFromDirectionVector(newDir));
-        this.originalAngle = this.boundAngle(Edge.getAngleFromDirectionVector(Edge.getDirectionVector(this.fromPort)));
-        console.log(`Created new edge with fromPort ${this.fromPort} and toPort ${this.toPort}`)
+        this.targetAngle = Edge.getAngle(this.toPort, false);
+        this.originalAngle = Edge.getAngle(this.fromPort, false);
+        console.log(`Created new edge with fromPort ${this.fromPort} (${this.originalAngle}) and toPort ${this.toPort} (${this.targetAngle})`)
     }
 
     // return dx, dy for vector
@@ -50,6 +50,30 @@ export class Edge {
             case StationPort.NW: return {x: -1, y: -1};
             default:             return {x: 0, y: 0};
         }
+    }
+
+    static getAngle(port: StationPort, reversed: boolean): number {
+        let res: number;
+        
+        switch (port) {
+            case StationPort.N:  res = Math.PI/2;
+            break;
+            case StationPort.NE: res = -Math.PI/4;
+            break;
+            case StationPort.E:  res = 0;
+            break;
+            case StationPort.SE: res = Math.PI/4;
+            break;
+            case StationPort.S:  res = Math.PI/2;
+            break;
+            case StationPort.SW: res = -Math.PI/4;
+            break;
+            case StationPort.W:  res = 0;
+            break;
+            case StationPort.NW: res = Math.PI/4;
+            break;
+        }
+        return res;
     }
 
     static normalizeVector(vector: { x: number, y: number }): { x: number, y: number } {
@@ -101,6 +125,10 @@ export class Edge {
     getInterpolatedAngle(pct: number) {
         if (pct < 0 || pct >= 1) {
             console.warn(`interpolation function received pct ${pct}`);
+        }
+        const angleDiff = this.targetAngle - this.originalAngle;
+        if (Math.abs(angleDiff) != Math.PI/4) {
+            console.error(`Difference between target and original angle is ${angleDiff}`);
         }
         return this.originalAngle + (this.targetAngle - this.originalAngle) * pct;
     }
