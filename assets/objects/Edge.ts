@@ -13,8 +13,8 @@ export class Edge {
     jointY: number;
     jointPct: number;
     totalLength: number;
-    originalAngle: number;
-    targetAngle: number;
+    originalAngle!: number;
+    targetAngle!: number;
     toOffset: {x: number, y: number};
     fromOffset: {x: number, y: number};
 
@@ -29,18 +29,26 @@ export class Edge {
         this.jointPct = this.getPctElapsed(this.jointX, this.jointY);
         this.totalLength = this.getDistToJoint(this.from.x, this.from.y) + 
                             this.getDistToJoint(this.to.x, this.to.y);
+        this.setEdgeAngles();
         //console.log(`New edge has joint pct ${this.jointPct}`);
         const oppositeDir = Edge.getDirectionVector(this.toPort);
         const newDir = {x: oppositeDir.x * -1, y: oppositeDir.y * -1};
-        this.targetAngle = Edge.getAngle(this.toPort);
-        this.originalAngle = Edge.getAngle(this.fromPort);
+        
+        console.log(`Created new edge with fromPort ${this.fromPort} (${this.originalAngle}) and toPort ${this.toPort} (${this.targetAngle})`)
+    }
+
+    setEdgeAngles(): void {
+        // set angles based on ports
+        this.targetAngle = Edge.getAngleFromPort(this.toPort);
+        this.originalAngle = Edge.getAngleFromPort(this.fromPort);
+        // handle edge case: N and S need to be either + or - PI/2
+        // depending on which direction the edge turns
         if (Math.abs(this.originalAngle) == Math.PI/2) {
             const angleDiff = Math.abs(this.targetAngle - this.originalAngle);
             if (angleDiff > Math.PI/4) {
                 this.originalAngle *= -1;
             }
         }
-        console.log(`Created new edge with fromPort ${this.fromPort} (${this.originalAngle}) and toPort ${this.toPort} (${this.targetAngle})`)
     }
 
     // return dx, dy for vector
@@ -58,7 +66,7 @@ export class Edge {
         }
     }
 
-    static getAngle(port: StationPort): number {
+    static getAngleFromPort(port: StationPort): number {
         let res: number;
         switch (port) {
             case StationPort.N:  res = Math.PI/2;
