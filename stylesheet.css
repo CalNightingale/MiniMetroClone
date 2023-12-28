@@ -25,7 +25,8 @@ body, html {
 /* Style the title */
 h1 {
     text-align: center;
-    margin: 10px 10px;
+    margin-top:0.75em;
+    margin-bottom: 0.25em;
     font-size: 2em;
     color: #333;
 }
@@ -51,4 +52,38 @@ p {
     min-height: 600px;
     margin: 0;
     border: 5px solid #333;
+}
+
+
+/* Styles for mobile devices */
+@media only screen and (max-width: 768px) { /* Adjust the max-width as needed for your design */
+    #gameCanvas {
+        display: none; /* Hide the game canvas on smaller screens */
+    }
+
+    #instructions {
+        display: none;
+    }
+
+    #mobileMessage {
+        display: block; /* Show the mobile message */
+        text-align: center;
+        padding: 20px;
+        margin: 10px;
+        font-size: 18px; /* Adjust size as needed */
+        font-family: 'Courier New', Courier, monospace;
+        color: #333; /* Adjust color as needed */
+        border: 5px solid #333;
+    }
+}
+
+/* Styles for larger screens */
+@media only screen and (min-width: 769px) {
+    #mobileMessage {
+        display: none; /* Hide the message on larger screens */
+    }
+
+    #instructions {
+        display: block;
+    }
 }
