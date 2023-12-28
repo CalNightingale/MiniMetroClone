@@ -32,9 +32,7 @@ export class Edge {
         this.setEdgeAngles();
         //console.log(`New edge has joint pct ${this.jointPct}`);
         const oppositeDir = Edge.getDirectionVector(this.toPort);
-        const newDir = {x: oppositeDir.x * -1, y: oppositeDir.y * -1};
-        
-        console.log(`Created new edge with fromPort ${this.fromPort} (${this.originalAngle}) and toPort ${this.toPort} (${this.targetAngle})`)
+        const newDir = {x: oppositeDir.x * -1, y: oppositeDir.y * -1};        
     }
 
     setEdgeAngles(): void {
@@ -112,7 +110,6 @@ export class Edge {
     }
 
     setOffset(offset: {x: number, y: number}, station: Station): void {
-        console.log(`OFFSET SET CALL ${offset.x}, ${offset.y}`);
         if (station == this.to) {
             this.toOffset = offset;
         } else if (station == this.from) {

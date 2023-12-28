@@ -127,7 +127,6 @@ export class StationGraph {
     }
 
     recalculatePassengerRoutes(): void {
-        console.log(`RECALCULATING PASSENGER ROUTES`);
         for (let station of this.stations) {
             station.recalculatePassengerRoutes(this);
         }
@@ -135,7 +134,7 @@ export class StationGraph {
 
     addEdge(fromStation: Station, toStation: Station, line: Line): void {
         if (fromStation == toStation) {
-            console.log(`Ignoring self-edge at station ${fromStation.toString()}`)
+            console.warn(`Ignoring self-edge at station ${fromStation.toString()}`)
             return;
         }
 
@@ -148,7 +147,7 @@ export class StationGraph {
         if (!edgeExists) {
             // if an edge exists that ends at toStation, we should flip the direction
             // of the new edge
-            const flipDirection = this.lines[this.activeLine].hasEdgeEndingAtStation(toStation);
+            const flipDirection = line.hasEdgeEndingAtStation(toStation);
             const correctedTo = flipDirection ? fromStation : toStation;
             const correctedFrom = flipDirection ? toStation : fromStation;
             console.log(`Adding edge from ${correctedFrom.toString()} to ${correctedTo.toString()}`);
@@ -157,7 +156,7 @@ export class StationGraph {
             line.addEdge(newEdge);
             this.recalculatePassengerRoutes();
         } else {
-            console.log(`Edge from ${fromStation.toString()} to ${toStation.toString()} already exists.`);
+            console.warn(`Edge from ${fromStation.toString()} to ${toStation.toString()} already exists.`);
         }
     }
 
@@ -266,7 +265,6 @@ export class StationGraph {
         this.activeDrag.line.hovered = true;
         
         station.setOutlineColor(this.activeDrag.line.getColor());
-        console.log(`STARTING A DRAG WITH LINE ${this.activeDrag.line}`);
     }
 
     // Call this method when the drag ends

@@ -35,10 +35,9 @@ export class Station {
         this.ports = new Map<StationPort, Edge[]>();
 
         this.id = Station.lastID++; // Assign a unique ID to the station.
-        console.log(`creating station of type ${this.stationType}`);
+        //console.log(`creating station of type ${this.stationType}`);
         switch (this.stationType) {
             case StationType.Circle:
-                console.log(`theoretically valid visual created`);
                 this.visual = new Circle(x, y, this.size/2, 'white');
                 break;
             case StationType.Square:
