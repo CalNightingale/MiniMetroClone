@@ -18,23 +18,30 @@ body, html {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    height: auto;
     background: linear-gradient(to right, #74ebd5, #acb6e5);
 }
 
 /* Style the title */
 h1 {
     text-align: center;
-    margin: 20px 0;
+    margin: 10px 10px;
     font-size: 2em;
     color: #333;
 }
 
+/* Subtitle */
 h2 {
     text-align: center;
-    margin: 20px 0;
+    margin: 0 0 0 0;
     font-size: 1.6em;
     color: #333;
+}
+
+p {
+    margin: 10px 0;
+    max-width: 1000px;
+    text-align: center;
 }
 
 /* Center the game canvas */
@@ -42,12 +49,6 @@ h2 {
     width: 100%;
     max-width: 1000px; /* or the max width you want for your game */
     min-height: 600px;
-    margin: 0 auto;
+    margin: 0;
     border: 5px solid #333;
-}
-
-/* Additional styles */
-canvas {
-    display: block; /* Remove inline spacing */
-    margin: auto; /* Center the canvas if it's not full screen */
 }
