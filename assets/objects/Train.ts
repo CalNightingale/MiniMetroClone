@@ -155,7 +155,7 @@ export class Train {
         }
         // filter out the passengers whose destination matches the current station's type
         this.passengers = this.passengers.filter(passenger => {
-            if (passenger.targetStation == station) {
+            if (passenger.path && passenger.path.targetStation == station) {
                 if (passenger.destination == station.stationType) {
                     // passenger reached destination!
                     // TODO some sort of score increment here
@@ -184,7 +184,8 @@ export class Train {
         // Iterate over all people at the station
         station.people = station.people.filter(person => {
             // Check if the person's target line and reversed state match the train's
-            if (person.targetLine === this.getLine() && person.isReversed === this.reversed) {
+            if (person.path && person.path.line == this.getLine() && 
+            (person.path.reversed == this.reversed || this.getLine().isCycle)) {
                 // Add the person to the train's passengers
                 boardingPassengers.push(person);
                 // Do not keep this person in the station's people list

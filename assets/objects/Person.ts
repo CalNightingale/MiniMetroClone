@@ -10,17 +10,19 @@ import { StationGraph } from '../StationGraph';
 import { Line } from './Line';
 import { Edge } from './Edge';
 
+type Route = {edge: Edge, reversed: boolean};
+type Path = {line: Line, reversed: boolean, targetStation: Station};
+
 export class Person {
     destination: StationType;
     visual: Shape;
-    targetStation: Station | null = null;
-    targetLine: Line | null = null;
-    isReversed: boolean = false;
+    path: Path | null;
 
     constructor(destination: StationType) {
         this.destination = destination;
         // start drawing off screen
         const startPos = {x: -1000, y: -1000};
+        this.path = null;
         switch (this.destination) {
             case StationType.Circle:
                 this.visual = new Circle(startPos.x, startPos.y, Constants.PERSON_SIZE, 'black');
@@ -34,64 +36,84 @@ export class Person {
         }
     }
 
-
-    calculateTargetStation(startStation: Station, graph: StationGraph): void {
-        const visited = new Set<Station>();
-        const queue: Array<{
-            currentStation: Station, 
-            edge: Edge | null, 
-            transferStation: Station | null, 
-            currentLines: Set<Line>,
-            firstEdge: Edge | null
-        }> = [];
-        const startLines = new Set(startStation.getLines());
-
-        queue.push({
-            currentStation: startStation, 
-            edge: null, 
-            transferStation: null, 
-            currentLines: startLines,
-            firstEdge: null
-        });
-        visited.add(startStation);
-
-        while (queue.length > 0) {
-            const { currentStation, edge, transferStation, currentLines, firstEdge } = queue.shift()!;
-
-            // Check if station type matches destination
-            if (currentStation.stationType === this.destination) {
-                this.targetStation = transferStation ?? currentStation;
-                this.targetLine = firstEdge ? firstEdge.line : null;
-                this.isReversed = firstEdge ? firstEdge.to === startStation : false;
-                return;
-            }
-
-            // Get accessible edges and enqueue them if not visited
-            const accessibleEdges = graph.getEdgesAccessibleFromStation(currentStation);
-            for (let nextEdge of accessibleEdges) {
-                let nextStation = nextEdge.from === currentStation ? nextEdge.to : nextEdge.from;
-                if (!visited.has(nextStation)) {
-                    visited.add(nextStation);
-                    // Determine if a line transfer is happening
-                    const nextStationLines = new Set(nextStation.getLines());
-                    const isTransfer = ![...currentLines].some(line => nextStationLines.has(line));
-                    const newTransferStation = isTransfer ? currentStation : transferStation;
-                    const newFirstEdge = firstEdge || (isTransfer ? null : nextEdge);
-                    queue.push({ 
-                        currentStation: nextStation,
-                        edge: nextEdge,
-                        transferStation: newTransferStation,
-                        currentLines: isTransfer ? nextStationLines : currentLines,
-                        firstEdge: newFirstEdge
-                    });
+    getAvailableRoutes(station: Station, visited: Route[]): Route[] {
+        const allEdges = station.getEdges();
+        const availableRoutes: Route[] = [];
+        allEdges.forEach(edge => {
+            const isEdgeReversed = edge.to == station;
+            const potentialRoute = {edge: edge, reversed: isEdgeReversed};
+            let newRoute = true;
+            // iterate over all visited edges and ignore this one if there's a match
+            visited.forEach(routeStep => {
+                if (routeStep.edge == potentialRoute.edge) {
+                    newRoute = false;
                 }
+            });
+            if (newRoute) availableRoutes.push(potentialRoute);
+        });
+        return availableRoutes;
+    }
+
+    updatePath(startStation: Station): void {
+        const fullRoute = this.getFullRoute(startStation);
+        // if no route can be found, set pointers to null
+        if (!fullRoute) {
+            this.path = null;
+        } else {
+            const initialLine = fullRoute[0].edge.line;
+            const initiallyReversed = fullRoute[0].reversed;
+            const lastStep = fullRoute[fullRoute.length - 1];
+            // begin by assuming there are no transfers
+            let lastStationOnInitialLine = lastStep.reversed ? lastStep.edge.from : lastStep.edge.to;
+            // iterate through full route, updating target station until the line no longer matches
+            let transferred = false;
+            fullRoute.forEach(routeStep => {
+                const curLine = routeStep.edge.line;
+                // if we have found a transfer, update target station accordingly
+                if (curLine != initialLine && !transferred) {
+                    transferred = true;
+                    lastStationOnInitialLine = routeStep.reversed ? routeStep.edge.to : routeStep.edge.from;
+                }
+            });
+            this.path = {line: initialLine, reversed: initiallyReversed, targetStation: lastStationOnInitialLine};
+        }
+    }
+
+    /**
+     * Get the shortest possible route from a given station to this person's destination 
+     * @param startStation station to start at
+     * @returns a list of Route steps (edges and directions of travel), or null if no route can be found
+     */
+    getFullRoute(startStation: Station): Route[] | null {
+        // begin by getting a list of all unvisited edges from this station
+        const initialRoutes = this.getAvailableRoutes(startStation, []);
+        const availableRoutes: Route[][] = [];
+        initialRoutes.forEach(initialRoute => {
+            availableRoutes.push([initialRoute]);
+        });
+        // BFS
+        while (availableRoutes.length > 0) {
+            // get a route to check
+            const curRouteTracker = availableRoutes.shift();
+            if (!curRouteTracker) throw new Error(`BFS critical failure`);
+            const lastRouteStep = curRouteTracker[curRouteTracker.length - 1];
+            const hypotheticalStation = lastRouteStep.reversed ? lastRouteStep.edge.from : lastRouteStep.edge.to;
+            // check end condition and return if true
+            if (hypotheticalStation.stationType == this.destination) {
+                return curRouteTracker;
+            }
+            // if we get here we know that our hypothetical station is the wrong type
+            // get new potential ways we can go
+            const newPotentialRouteSteps = this.getAvailableRoutes(hypotheticalStation, curRouteTracker);
+            // iterate over possible next steps, create a new hypothetical route, and add it to check
+            for (let potentialRouteStep of newPotentialRouteSteps) {
+                const hypotheticalRoute = curRouteTracker;
+                hypotheticalRoute.push(potentialRouteStep);
+                availableRoutes.push(hypotheticalRoute);
             }
         }
-
-        // If no station found, target station and other properties remain null
-        this.targetStation = null;
-        this.targetLine = null;
-        this.isReversed = false;
+        // if we get here it is impossible to route person so return null
+        return null;
     }
 
     draw(p: p5, x: number, y: number, size: number) {
@@ -118,6 +140,9 @@ export class Person {
     }
 
     toString(): string {
-        return `PERSON taking ${this.targetLine} (reversed: ${this.isReversed}) to ${this.targetStation}`
+        if (this.path) {
+            return `Person taking ${this.path.line} (reversed: ${this.path.reversed}) to ${this.path.targetStation}`;
+        }
+        return `Stranded person who wants to get to ${this.destination}`;
     }
 }

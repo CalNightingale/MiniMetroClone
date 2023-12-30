@@ -29,6 +29,13 @@ export class StationGraph {
         this.activeDrag = {startStation: null, line: null};
         this.timeSinceSpawn = Constants.SPAWN_RATE;
         this.populateStations(Constants.NUM_STATIONS, p);
+        // FOR DEBUGGING
+        /*
+        this.stations = [new Station(200,200,StationType.Circle,p), 
+                        new Station(400,200,StationType.Square,p),
+                        new Station(200,400,StationType.Triangle,p),
+                        new Station(400,400,StationType.Circle,p)];
+        this.handleSpawning(); */
     }
 
     populateStations(numStations: number, p: p5): void {
@@ -195,7 +202,8 @@ export class StationGraph {
 
     draw(p: p5): void {
         // first handle spawning
-        this.handleSpawning();
+        this.handleSpawning(); // TODO UNCOMMENT TO RE-ENABLE SPAWNING
+        
 
         // draw line if dragging
         this.drawDragLine(p);

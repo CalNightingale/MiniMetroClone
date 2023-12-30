@@ -13,6 +13,7 @@ export class Line {
     private trains: Train[];
     private unlocked: boolean;
     hovered: boolean;
+    isCycle: boolean;
 
     constructor(color: string) {
         this.color = color;
@@ -20,6 +21,7 @@ export class Line {
         this.trains = [];
         this.unlocked = false;
         this.hovered = false;
+        this.isCycle = false;
     }
 
     getColor(): string {
@@ -50,6 +52,12 @@ export class Line {
         if (this.edges.indexOf(edge) >= 0) {
             throw new Error(`Tried to add existing edge to line`);
         }
+        this.edges.forEach(existingEdge => {
+            if (existingEdge.from == edge.to) {
+                console.log(`MADE A CYCLE`);
+                this.isCycle = true;
+            }
+        });
         this.edges.push(edge);
         // Update stations with the line
         edge.from.addEdgeToPort(edge, edge.fromPort);
@@ -59,6 +67,7 @@ export class Line {
             let newTrain = new Train(edge);
             this.trains.push(newTrain);
         }
+        
     }
 
     hasEdgeEndingAtStation(station: Station): boolean {

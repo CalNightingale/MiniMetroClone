@@ -62,6 +62,16 @@ export class Station {
         return lines;
     }
 
+    getEdges(): Edge[] {
+        let edges: Edge[] = [];
+        this.ports.forEach(edgeList => {
+            edgeList.forEach(edge => {
+                edges.push(edge);
+            })
+        })
+        return edges;
+    }
+
     getLineForNewEdge(): Line | null {
         const lineUsageCount = new Map<Line, number>();
     
@@ -153,7 +163,7 @@ export class Station {
 
     recalculatePassengerRoutes(graph: StationGraph): void {
         for (let person of this.people) {
-            person.calculateTargetStation(this, graph);
+            person.updatePath(this);
             //console.log(`PERSON ${person} taking ${person.targetLine} (reversed: ${person.isReversed}) to ${person.targetStation}`);
         }
     }
