@@ -10,6 +10,7 @@ import { StationPort } from './StationPort';
 import { Line } from './Line';
 import { StationGraph } from '../StationGraph';
 import { Edge } from './Edge';
+import { LineEnd } from './LineEnd';
 
 export class Station {
     static lastID = 0;
@@ -22,7 +23,7 @@ export class Station {
     people: Person[];
     stationType: StationType;
     outlineColor: string;
-    private ports: Map<StationPort, Edge[]>;
+    private ports: Map<StationPort, (Edge|LineEnd)[]>;
 
     constructor(x: number, y: number, stationType: StationType, p: p5) {
         this.x = x;
@@ -32,7 +33,7 @@ export class Station {
         this.outlineColor = 'black';
         this.people = [];
         // populate ports with empty arrays
-        this.ports = new Map<StationPort, Edge[]>();
+        this.ports = new Map<StationPort, (Edge|LineEnd)[]>();
 
         this.id = Station.lastID++; // Assign a unique ID to the station.
         //console.log(`creating station of type ${this.stationType}`);
@@ -54,8 +55,9 @@ export class Station {
     getLines(): Line[] {
         let lines: Line[] = [];
         this.ports.forEach((edgeList) => {
-            edgeList.forEach(edge => { 
-                if (!lines.includes(edge.line)) {
+            edgeList.forEach(edge => {
+                // ignore line ends
+                if (edge instanceof Edge && !lines.includes(edge.line)) {
                     lines.push(edge.line);
                 }
             })})
@@ -66,7 +68,8 @@ export class Station {
         let edges: Edge[] = [];
         this.ports.forEach(edgeList => {
             edgeList.forEach(edge => {
-                edges.push(edge);
+                // ignore line ends
+                if (edge instanceof Edge) edges.push(edge);
             })
         })
         return edges;
@@ -77,9 +80,9 @@ export class Station {
     
         // Count the number of ports used by each line
         this.ports.forEach((edgeList) => {
-            edgeList.forEach(edge => {
-                if (edge.line !== null) {
-                    lineUsageCount.set(edge.line, (lineUsageCount.get(edge.line) || 0) + 1);
+            edgeList.forEach(edgeOrEnd => {
+                if (edgeOrEnd instanceof Edge  && edgeOrEnd.line != null) {
+                    lineUsageCount.set(edgeOrEnd.line, (lineUsageCount.get(edgeOrEnd.line) || 0) + 1);
                 }
             })
         });
@@ -96,7 +99,7 @@ export class Station {
     }
     
     resolveEdgeOverlaps(): void {
-        // TODO
+        //
     }
 
     addEdgeToPort(edge: Edge, port: StationPort) {
@@ -110,6 +113,40 @@ export class Station {
         }
         this.ports.set(port, portEdges);
         this.resolveEdgeOverlaps();
+        // TODO iterate over all edges at this station and determine whether the curLine ends
+        // at this station (only one edge for curLine here)
+        // if there is, create a new LineEnd (rotation should be opposite direction from new edge's port)
+        // and push the LineEnd to the proper port in this.ports
+        // Check if the current line ends at this station
+        const curLine = edge.line;
+        const edgesOfCurLine = this.getEdges().filter(e => e.line === curLine);
+
+        if (edgesOfCurLine.length === 1) {
+            // If this is the only edge for curLine at this station, the line ends here
+            const oppositeDir = Edge.getDirectionVector(port);
+            const newDir = {x: -oppositeDir.x, y: -oppositeDir.y};
+            const rotation = Edge.getAngleFromDirectionVector(newDir);
+
+            // Create a new LineEnd
+            const lineEnd = new LineEnd(curLine, rotation);
+            // Assuming you need to add the LineEnd to the port
+            // You might need to adjust this part based on how you're planning to use LineEnd objects
+            if (!this.ports.has(port)) {
+                this.ports.set(port, []);
+            }
+            this.ports.get(port)?.push(lineEnd); // Check if port exists and then push LineEnd
+        } else if (edgesOfCurLine.length === 2) {
+            // If there are two edges for curLine, remove the existing LineEnd for curLine
+            this.ports.forEach((portList, portKey) => {
+                this.ports.set(portKey, portList.filter(edgeOrEnd => {
+                    if (edgeOrEnd instanceof LineEnd && edgeOrEnd.line === curLine) {
+                        // Remove the LineEnd
+                        return false;
+                    }
+                    return true; // Keep other edges and LineEnds not related to curLine
+                }));
+            });
+        }
     }
 
     setOutlineColor(newColor: string): void {
@@ -117,12 +154,24 @@ export class Station {
     }
 
     draw(p: p5): void {
+        // first draw line ends
+        this.drawLineEnds(p);
         p.stroke(this.outlineColor);
         p.strokeWeight(Constants.STATION_OUTLINE);
         // first draw visual
         this.visual.draw(p);
         // now draw people
         this.drawPeople(p);
+    }
+
+    drawLineEnds(p: p5): void {
+        this.ports.forEach(edgeAndEndList => {
+            edgeAndEndList.forEach(edgeOrEnd =>{
+                if (edgeOrEnd instanceof LineEnd) {
+                    edgeOrEnd.draw(p, this.getCenterX(), this.getCenterY());
+                }
+            });
+        });
     }
 
     drawPeople(p: p5): void {

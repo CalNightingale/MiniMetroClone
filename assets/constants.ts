@@ -19,6 +19,8 @@ export const Constants = {
     // LINES
     NUM_STARTING_LINES: 3,
     EDGE_WIDTH: 15,
+    // LINE ENDS
+    LINE_END_BASE_LENGTH: 45,
     // PEOPLE
     PERSON_SIZE: 12.5,
     PERSON_XOFFSET: 5,

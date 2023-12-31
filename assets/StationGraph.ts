@@ -116,16 +116,6 @@ export class StationGraph {
         return edges;
     }
 
-    getActiveLine(): Line | null {
-        let totalNumEdges = 0;
-        this.lines.forEach(line => {
-            if (line.isInService()) {
-                totalNumEdges += line.edges.length;
-            } });
-        if (totalNumEdges == 0) return null;
-        return this.lines[this.activeLine];
-    }
-
     addStation(station: Station): void {
         if (this.stations.indexOf(station) > -1) {
             throw new Error(`Station with id ${station.id} already exists.`);

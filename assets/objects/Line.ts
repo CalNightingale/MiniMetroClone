@@ -37,9 +37,14 @@ export class Line {
     }
 
     isInService(): boolean {
-        return this.edges.length > 0;
+        return this.getNumEdges() > 0;
     }
 
+    getNumEdges(): number {
+        const onlyEdges = this.edges.filter(edgeOrEnd => edgeOrEnd instanceof Edge);
+        return onlyEdges.length;
+    }
+ 
     getMenuIcon(): {size: number, color: string} {
         if (!this.unlocked) 
             return {size: Constants.LINE_MENU_SIZE * Constants.LINE_MENU_INACTIVE_MULTIPLIER, color: Constants.LOCKED_COLOR};
@@ -52,12 +57,14 @@ export class Line {
         if (this.edges.indexOf(edge) >= 0) {
             throw new Error(`Tried to add existing edge to line`);
         }
+        // iterate through edges to check for a cycle
         this.edges.forEach(existingEdge => {
             if (existingEdge.from == edge.to) {
                 console.log(`MADE A CYCLE`);
                 this.isCycle = true;
             }
         });
+        // actually add new edge
         this.edges.push(edge);
         // Update stations with the line
         edge.from.addEdgeToPort(edge, edge.fromPort);
