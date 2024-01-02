@@ -221,8 +221,9 @@ export class Station {
         return this.people.pop();
     }
 
-    toString(): string {
+    toString(showCoords: boolean=false): string {
         // Assuming the station has an 'id' property that is unique
-        return `Station(${this.id}) at coordinates (${this.x}, ${this.y})`;
+        if (showCoords) return `Station(${this.id}) at coordinates (${this.x}, ${this.y})`;
+        return `Station(${this.id})`;
     }
 }

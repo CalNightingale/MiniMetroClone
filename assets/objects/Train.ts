@@ -69,10 +69,10 @@ export class Train {
         } else {
             // if edges are in opposite directions, must flip reverse
             if (this.edge.to == nextEdge.to) {
-                console.error(`EDGES IN OPPOSITE DIRECTIONS. CUR edge: ${this.edge}, next: ${nextEdge}`);
+                console.error(`NEW EDGE IN OPPOSITE DIR. CUR edge: ${this.edge}, next: ${nextEdge}`);
             }
             this.setMoveDir(Edge.getDirectionVector(this.reversed ? nextEdge.toPort: nextEdge.fromPort));
-            // update movement direction 
+            // update movement direction
             if (this.reversed) {
                 this.visual.angle = nextEdge.targetAngle;
             } else {

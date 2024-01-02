@@ -136,7 +136,7 @@ export class StationGraph {
         }
 
         // Check if the edge already exists in either direction
-        const edgeExists = this.lines[this.activeLine].edges.some(edge =>
+        const edgeExists = line.edges.some(edge =>
             (edge.from === fromStation && edge.to === toStation) ||
             (edge.from === toStation && edge.to === fromStation)
         );
@@ -144,12 +144,21 @@ export class StationGraph {
         if (!edgeExists) {
             // if an edge exists that ends at toStation, we should flip the direction
             // of the new edge
-            const flipDirection = line.hasEdgeEndingAtStation(toStation);
+            const endingAtTo = line.hasEdgeEndingAtStation(toStation);
+            const startingAtFrom = line.hasEdgeStartingAtStation(fromStation);
+            const flipDirection = endingAtTo || startingAtFrom;
             const correctedTo = flipDirection ? fromStation : toStation;
             const correctedFrom = flipDirection ? toStation : fromStation;
-            console.log(`Adding edge from ${correctedFrom.toString()} to ${correctedTo.toString()}`);
+            // check whether this bisects the line
+            const edgesTouchingTo = line.edges.filter(edge => edge.to == correctedTo || edge.from == correctedTo);
+            const edgesTouchingFrom = line.edges.filter(edge => edge.to == correctedFrom || edge.from == correctedFrom);
+            if (edgesTouchingTo.length > 1 || edgesTouchingFrom.length > 1) {
+                console.warn(`Rejecting edge that bisects existing line`);
+                return;
+            }
             // update station ports
             let newEdge = new Edge(correctedFrom, correctedTo, line);
+            console.log(`Adding edge from ${correctedFrom.toString()} (port ${newEdge.fromPort}) to ${correctedTo.toString()} (port ${newEdge.toPort})`);
             line.addEdge(newEdge);
             this.recalculatePassengerRoutes();
         } else {

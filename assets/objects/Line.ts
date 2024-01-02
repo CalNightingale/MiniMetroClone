@@ -53,23 +53,35 @@ export class Line {
         return {size: Constants.LINE_MENU_SIZE, color: this.getColor()};
     }
 
+    updateCycleStatus(): void {
+        let isCycle = this.edges.length > 0; // Assume it's a cycle initially, but only if there are edges
+
+        for (let i = 0; i < this.edges.length; i++) {
+            const currentEdge = this.edges[i];
+            const anotherEdgeEndsWhereThisOneStarts = this.edges.some(edge => edge.to === currentEdge.from);
+            const anotherEdgeStartsWhereThisOneEnds = this.edges.some(edge => edge.from === currentEdge.to);
+    
+            if (!anotherEdgeEndsWhereThisOneStarts || !anotherEdgeStartsWhereThisOneEnds) {
+                isCycle = false;
+                break; // No need to check further if one edge breaks the cycle
+            }
+        }
+        if (isCycle) console.log(`MADE A CYCLE`);
+        this.isCycle = isCycle;
+    }
+
     addEdge(edge: Edge) {
         if (this.edges.indexOf(edge) >= 0) {
             throw new Error(`Tried to add existing edge to line`);
         }
-        // iterate through edges to check for a cycle
-        this.edges.forEach(existingEdge => {
-            if (existingEdge.from == edge.to) {
-                console.log(`MADE A CYCLE`);
-                this.isCycle = true;
-            }
-        });
         // actually add new edge
         this.edges.push(edge);
-        // Update stations with the line
+        // update whether this made a cycle
+        this.updateCycleStatus();
+        // update stations with the line
         edge.from.addEdgeToPort(edge, edge.fromPort);
         edge.to.addEdgeToPort(edge, edge.toPort);
-        // If this is the first edge on this line (line was just created), add a train!
+        // if this is the first edge on this line (line was just created), add a train!
         if (this.edges.length == 1) {
             let newTrain = new Train(edge);
             this.trains.push(newTrain);
@@ -77,8 +89,12 @@ export class Line {
         
     }
 
-    hasEdgeEndingAtStation(station: Station): boolean {
-        return this.edges.some(edge => edge.to == station);
+    hasEdgeEndingAtStation(endStation: Station): boolean {
+        return this.edges.some(edge => edge.to == endStation);
+    }
+
+    hasEdgeStartingAtStation(startStation: Station): boolean {
+        return this.edges.some(edge => edge.from == startStation);
     }
 
     servesStation(station: Station): boolean {
