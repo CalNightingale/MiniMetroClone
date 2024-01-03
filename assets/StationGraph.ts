@@ -13,20 +13,16 @@ type Drag = {startStation: Station | null, line: Line | null};
 export class StationGraph {
     private stations: Station[];
     private lines: Line[];
-    private trains: Train[];
-    private activeLine: number;
     private activeDrag: Drag;
     private timeSinceSpawn: number;
 
     constructor(p: p5) {
         this.stations = [];
-        this.trains = [];
         this.lines = [new Line('red'), new Line('green'), new Line('blue'), 
                       new Line('purple'), new Line('yellow')];
         for (let i = 0; i < Constants.NUM_STARTING_LINES; i++) {
             this.lines[i].unlock();
         }
-        this.activeLine = 0;
         this.activeDrag = {startStation: null, line: null};
         this.timeSinceSpawn = Constants.SPAWN_RATE;
         this.populateStations(Constants.NUM_STATIONS, p);
@@ -37,6 +33,10 @@ export class StationGraph {
                         new Station(200,400,StationType.Triangle,p),
                         new Station(400,400,StationType.Circle,p)];
         this.handleSpawning(); */
+    }
+
+    getStation(stationID: number): Station {
+        return this.stations[stationID];
     }
 
     populateStations(numStations: number, p: p5): void {
@@ -283,20 +283,11 @@ export class StationGraph {
     public isDragging: boolean = false;
     private dragEndPoint: { x: number, y: number } | null = null;
 
-    getLineForEdge(station: Station): Line | null {
-        // if station has no edges, return the current active line
-        const openStationLine = station.getLineForNewEdge();
-        if (openStationLine) return openStationLine;
-        // if we get here, return the next available line (or null)
-        return this.getNextUnusedLine();
-    }
-
     // Call this method when a drag starts
     startDrag(station: Station, dragLine: Line | null): void {
         // assign drag line if not supplied
         if (!dragLine) {
-            dragLine = this.getLineForEdge(station);
-
+            dragLine = this.getNextUnusedLine();
         }
         // set active drag tracker
         this.activeDrag = {startStation: station, line: dragLine};

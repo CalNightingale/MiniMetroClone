@@ -16,7 +16,6 @@ export class LineEnd {
     }
 
     containsPoint(x: number, y: number): boolean {
-        console.log(`LE C P`);
         // Translate the point back
         const translatedX = x - this.station.getCenterX();
         const translatedY = y - this.station.getCenterY();

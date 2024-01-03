@@ -60,12 +60,13 @@ export class Person {
         return availableRoutes;
     }
 
-    updatePath(startStation: Station): void {
-        const fullRoute = this.getFullRoute(startStation);
+    updatePath(startStation: Station, debug: boolean=false): void {
+        const fullRoute = this.getFullRoute(startStation, debug);
         // if no route can be found, set pointers to null
         if (!fullRoute) {
             this.path = null;
         } else {
+            if (debug) console.log(fullRoute);
             const initialLine = fullRoute[0].edge.line;
             const initiallyReversed = fullRoute[0].reversed;
             const lastStep = fullRoute[fullRoute.length - 1];
@@ -90,7 +91,7 @@ export class Person {
      * @param startStation station to start at
      * @returns a list of Route steps (edges and directions of travel), or null if no route can be found
      */
-    getFullRoute(startStation: Station): Route[] | null {
+    getFullRoute(startStation: Station, debug: boolean): Route[] | null {
         // begin by getting a list of all unvisited edges from this station
         const initialRoutes = this.getAvailableRoutes(startStation, []);
         const availableRoutes: Route[][] = [];
@@ -102,6 +103,7 @@ export class Person {
             // get a route to check
             const curRouteTracker = availableRoutes.shift();
             if (!curRouteTracker) throw new Error(`BFS critical failure`);
+            if (debug) console.log(curRouteTracker);
             const lastRouteStep = curRouteTracker[curRouteTracker.length - 1];
             const hypotheticalStation = lastRouteStep.reversed ? lastRouteStep.edge.from : lastRouteStep.edge.to;
             // check end condition and return if true
