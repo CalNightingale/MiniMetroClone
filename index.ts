@@ -23,17 +23,9 @@ import { Train } from "./assets/objects/Train";
         graph.draw(p);
     };
 
-    p.mousePressed = () => {
-      let clickedStation = graph.getStationAtMouse(p.mouseX, p.mouseY);
-      if (clickedStation) {
-          graph.startDrag(clickedStation);
-      }
-    };
+    p.mousePressed = () => graph.mousePressed(p);
 
-    p.mouseReleased = () => {
-      let endStation = graph.getStationAtMouse(p.mouseX, p.mouseY);
-      graph.endDrag(endStation);
-    };
+    p.mouseReleased = () => graph.mouseReleased(p);
 
     p.mouseDragged = () => {
       if (graph.isDragging) {
