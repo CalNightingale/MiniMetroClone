@@ -36,6 +36,16 @@ export class Person {
         }
     }
 
+    static printRoute(route: Route[]) {
+        let routeStr = "";
+        route.forEach(routeStep => {
+            const start = routeStep.reversed ? routeStep.edge.to : routeStep.edge.from;
+            const end = routeStep.reversed ? routeStep.edge.from : routeStep.edge.to;
+            routeStr += `${start.id} -> ${end.id} (${routeStep.reversed}); `;
+        });
+        console.log(routeStr);
+    }
+
     getAvailableRoutes(station: Station, visited: Route[]): Route[] {
         const allEdges = station.getEdges();
         const availableRoutes: Route[] = [];
@@ -66,7 +76,7 @@ export class Person {
         if (!fullRoute) {
             this.path = null;
         } else {
-            if (debug) console.log(fullRoute);
+            if (debug) Person.printRoute(fullRoute);
             const initialLine = fullRoute[0].edge.line;
             const initiallyReversed = fullRoute[0].reversed;
             const lastStep = fullRoute[fullRoute.length - 1];
@@ -103,7 +113,7 @@ export class Person {
             // get a route to check
             const curRouteTracker = availableRoutes.shift();
             if (!curRouteTracker) throw new Error(`BFS critical failure`);
-            if (debug) console.log(curRouteTracker);
+            //if (debug) console.log(curRouteTracker);
             const lastRouteStep = curRouteTracker[curRouteTracker.length - 1];
             const hypotheticalStation = lastRouteStep.reversed ? lastRouteStep.edge.from : lastRouteStep.edge.to;
             // check end condition and return if true

@@ -202,18 +202,16 @@ export class StationGraph {
 
     draw(p: p5): void {
         // first handle spawning
-        this.handleSpawning(); // TODO UNCOMMENT TO RE-ENABLE SPAWNING
+        this.handleSpawning(); // UNCOMMENT TO RE-ENABLE SPAWNING
         
-
         // draw line if dragging
         this.drawDragLine(p);
-
+        // next do line ends
+        this.stations.forEach(station => station.drawLineEnds(p));
         // then draw lines
         this.lines.forEach(line => line.draw(p, this));
-
         // then draw stations
         this.stations.forEach(station => station.draw(p));
-
         // finally menu
         this.drawMenu(p);
     }

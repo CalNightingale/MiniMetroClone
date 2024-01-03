@@ -154,8 +154,6 @@ export class Station {
     }
 
     draw(p: p5): void {
-        // first draw line ends
-        this.drawLineEnds(p);
         p.stroke(this.outlineColor);
         p.strokeWeight(Constants.STATION_OUTLINE);
         // first draw visual
