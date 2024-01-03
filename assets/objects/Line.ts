@@ -2,10 +2,13 @@ import p5 from "p5";
 import { Edge } from "./Edge";
 import { Constants } from "../constants";
 import { Train } from "./Train";
-import { Person } from "./Person";
-import { StationType } from "./StationType";
 import { Station } from "./Station";
 import { StationGraph } from "../StationGraph";
+
+export enum LineDirection {
+    FORWARD,
+    REVERSED
+}
 
 export class Line {
     private color: string;
@@ -22,6 +25,18 @@ export class Line {
         this.unlocked = false;
         this.hovered = false;
         this.isCycle = false;
+    }
+
+    getDirectionsServed(): LineDirection[] {
+        // if there's a train and it's not a cycle, both dirs are served
+        if (!this.isCycle && this.trains.length > 0) {
+            return [LineDirection.FORWARD, LineDirection.REVERSED];
+        }
+        // if it IS a cycle, train(s) may only serve one direction. Check
+        const dirsServed = [];
+        if (this.trains.some(train => !train.reversed)) dirsServed.push(LineDirection.FORWARD);
+        if (this.trains.some(train => train.reversed)) dirsServed.push(LineDirection.REVERSED);
+        return dirsServed;
     }
 
     getColor(): string {

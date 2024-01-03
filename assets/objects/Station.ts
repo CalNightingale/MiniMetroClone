@@ -203,7 +203,7 @@ export class Station {
 
     addPerson(person: Person, graph: StationGraph): void {
         this.people.push(person);
-        this.recalculatePassengerRoutes(graph);
+        person.updatePath(this);
     }
 
     isAtCapacity(): boolean {
@@ -213,6 +213,9 @@ export class Station {
     recalculatePassengerRoutes(graph: StationGraph): void {
         for (let person of this.people) {
             person.updatePath(this);
+            if (!person.path && this.getEdges().length > 0) {
+                console.warn(`UNABLE TO ROUTE PERSON AT ${this} DESPITE HAVING 1+ EDGES AT IT'S STATION`);
+            }
             //console.log(`PERSON ${person} taking ${person.targetLine} (reversed: ${person.isReversed}) to ${person.targetStation}`);
         }
     }

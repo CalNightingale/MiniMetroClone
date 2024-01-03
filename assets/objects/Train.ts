@@ -185,7 +185,7 @@ export class Train {
         station.people = station.people.filter(person => {
             // Check if the person's target line and reversed state match the train's
             if (person.path && person.path.line == this.getLine() && 
-            (person.path.reversed == this.reversed || this.getLine().isCycle)) {
+            (person.path.reversed == this.reversed)) {
                 // Add the person to the train's passengers
                 boardingPassengers.push(person);
                 // Do not keep this person in the station's people list

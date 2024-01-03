@@ -7,7 +7,7 @@ import { Triangle } from '../shapes/Triangle';
 import { Shape } from '../shapes/Shape';
 import { Station } from './Station';
 import { StationGraph } from '../StationGraph';
-import { Line } from './Line';
+import { Line, LineDirection } from './Line';
 import { Edge } from './Edge';
 
 type Route = {edge: Edge, reversed: boolean};
@@ -42,14 +42,20 @@ export class Person {
         allEdges.forEach(edge => {
             const isEdgeReversed = edge.to == station;
             const potentialRoute = {edge: edge, reversed: isEdgeReversed};
-            let newRoute = true;
+            let validNewRoute = true;
+            const dirsServed = edge.line.getDirectionsServed();
+            // if potential travel direction is unserved, route is invalid
+            if (isEdgeReversed && !dirsServed.includes(LineDirection.REVERSED) ||
+                !isEdgeReversed && !dirsServed.includes(LineDirection.FORWARD)) {
+                validNewRoute = false;
+            }
             // iterate over all visited edges and ignore this one if there's a match
             visited.forEach(routeStep => {
                 if (routeStep.edge == potentialRoute.edge) {
-                    newRoute = false;
+                    validNewRoute = false;
                 }
             });
-            if (newRoute) availableRoutes.push(potentialRoute);
+            if (validNewRoute) availableRoutes.push(potentialRoute);
         });
         return availableRoutes;
     }
