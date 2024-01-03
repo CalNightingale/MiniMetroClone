@@ -23,7 +23,7 @@ export class Station {
     people: Person[];
     stationType: StationType;
     outlineColor: string;
-    private ports: Map<StationPort, (Edge|LineEnd)[]>;
+    ports: Map<StationPort, (Edge|LineEnd)[]>;
 
     constructor(x: number, y: number, stationType: StationType, p: p5) {
         this.x = x;
@@ -128,7 +128,7 @@ export class Station {
             const rotation = Edge.getAngleFromDirectionVector(newDir);
 
             // Create a new LineEnd
-            const lineEnd = new LineEnd(curLine, rotation);
+            const lineEnd = new LineEnd(curLine, this, rotation);
             // Assuming you need to add the LineEnd to the port
             // You might need to adjust this part based on how you're planning to use LineEnd objects
             if (!this.ports.has(port)) {
@@ -168,7 +168,7 @@ export class Station {
         this.ports.forEach(edgeAndEndList => {
             edgeAndEndList.forEach(edgeOrEnd =>{
                 if (edgeOrEnd instanceof LineEnd) {
-                    edgeOrEnd.draw(p, this.getCenterX(), this.getCenterY());
+                    edgeOrEnd.draw(p);
                 }
             });
         });

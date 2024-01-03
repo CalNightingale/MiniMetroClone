@@ -6,6 +6,7 @@ import { Train } from './objects/Train';
 import { Line } from './objects/Line';
 import { StationType, getRandomStationType } from './objects/StationType';
 import { Person } from './objects/Person';
+import { LineEnd } from './objects/LineEnd';
 
 type Drag = {startStation: Station | null, line: Line | null};
 
@@ -250,6 +251,34 @@ export class StationGraph {
         return null;
     }
 
+    mousePressed(p: p5) {
+        // first check whether a station has been clicked
+        const clickedStation = this.getStationAtMouse(p.mouseX, p.mouseY);
+        if (clickedStation) {
+            this.startDrag(clickedStation, null);
+            return;
+        }
+        // check whether a line end has been clicked
+        this.stations.forEach(station => {
+            //console.log(`CHECKING ENDS at ${station}`);
+            station.ports.forEach(portList => {
+                portList.forEach(edgeOrEnd => {
+                    // check if a line end contains the clicked point 
+                    if (edgeOrEnd instanceof LineEnd && edgeOrEnd.containsPoint(p.mouseX, p.mouseY)) {
+                        this.startDrag(edgeOrEnd.station, edgeOrEnd.line);
+                        return;
+                    }
+                });
+            });
+        });
+
+    }
+
+    mouseReleased(p: p5) {
+        const endStation = this.getStationAtMouse(p.mouseX, p.mouseY);
+        this.endDrag(endStation);
+    }
+
     // Add these properties to the StationGraph class
     public isDragging: boolean = false;
     private dragEndPoint: { x: number, y: number } | null = null;
@@ -263,14 +292,20 @@ export class StationGraph {
     }
 
     // Call this method when a drag starts
-    startDrag(station: Station): void {
-        this.activeDrag = {startStation: station, line: this.getLineForEdge(station)};
+    startDrag(station: Station, dragLine: Line | null): void {
+        // assign drag line if not supplied
+        if (!dragLine) {
+            dragLine = this.getLineForEdge(station);
+
+        }
+        // set active drag tracker
+        this.activeDrag = {startStation: station, line: dragLine};
+        // if somehow the line is null, return (no lines left to drag)
         if (!this.activeDrag.line) {
             return;
         }
         this.isDragging = true;
         this.activeDrag.line.hovered = true;
-        
         station.setOutlineColor(this.activeDrag.line.getColor());
     }
 
